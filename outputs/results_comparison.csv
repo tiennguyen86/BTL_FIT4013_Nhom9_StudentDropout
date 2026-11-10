@@ -1,0 +1,9 @@
+﻿Flow,Model,Accuracy,Precision,Recall,F1-score,ROC-AUC,PR-AUC
+Luồng A (Cơ bản),"K-NN (k=11, distance)",0.8328,0.882,0.5528,0.6797,0.8848,0.8306
+Luồng A (Cơ bản),Naive Bayes (GNB),0.8282,0.7357,0.7254,0.7305,0.8618,0.7853
+Luồng A (Cơ bản),Decision Tree (max_depth=6),0.8689,0.8256,0.75,0.786,0.9055,0.8455
+Luồng A (Cơ bản),Random Forest (Mở rộng),0.8847,0.8889,0.7324,0.8031,0.9318,0.9011
+Luồng B (Cải tiến),"K-NN (k=11, distance)",0.8588,0.8878,0.6408,0.7444,0.9027,0.8553
+Luồng B (Cải tiến),Naive Bayes (GNB),0.8463,0.7662,0.75,0.758,0.8846,0.7886
+Luồng B (Cải tiến),Decision Tree (max_depth=6),0.8701,0.869,0.7007,0.7758,0.9089,0.8305
+Luồng B (Cải tiến),Random Forest (Mở rộng),0.8836,0.8664,0.7535,0.806,0.9329,0.9023

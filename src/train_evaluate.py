@@ -205,7 +205,7 @@ def run_experiment_pipeline() -> Tuple[pd.DataFrame, pd.DataFrame]:
         "False Negative (Bỏ sót rủi ro!)",
         "False Positive (Báo nhầm!)",
     ]
-    error_df["Prediction_Status"] = np.select(conditions, choices)
+    error_df["Prediction_Status"] = np.select(conditions, choices, default="Unknown")
     error_df.to_csv(ERROR_CSV_PATH, index=False, encoding="utf-8-sig")
 
     # 4. Vẽ các biểu đồ khoa học lưu vào outputs/Hinhve/

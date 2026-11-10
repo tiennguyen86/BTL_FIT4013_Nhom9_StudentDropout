@@ -1,0 +1,13 @@
+﻿Algorithm,Hyperparameter_Setting,Accuracy,F1-score,ROC-AUC
+Decision Tree,max_depth=3,0.8723,0.7964,0.9078
+Decision Tree,max_depth=4,0.8689,0.7671,0.9158
+Decision Tree,max_depth=6,0.8701,0.7758,0.9089
+Decision Tree,max_depth=8,0.8678,0.7805,0.9014
+Decision Tree,max_depth=10,0.8689,0.7836,0.8974
+Decision Tree,max_depth=None,0.8689,0.7836,0.9013
+K-NN,"n_neighbors=3, weights=distance",0.8373,0.7209,0.8611
+K-NN,"n_neighbors=5, weights=distance",0.8542,0.7446,0.8856
+K-NN,"n_neighbors=7, weights=distance",0.8463,0.7247,0.8971
+K-NN,"n_neighbors=11, weights=distance",0.8588,0.7444,0.9027
+K-NN,"n_neighbors=15, weights=distance",0.8531,0.7314,0.9082
+K-NN,"n_neighbors=21, weights=distance",0.8486,0.7173,0.9122
