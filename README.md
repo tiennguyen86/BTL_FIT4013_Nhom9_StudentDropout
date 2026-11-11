@@ -10,7 +10,7 @@
 
 | Mã sinh viên | Họ và tên | Lớp | Phân công công việc chính |
 | :---: | :--- | :---: | :--- |
-| **1871020569** | Nguyễn Hữu Tiến | CNTT 18-10 | Trưởng nhóm; Xây dựng pipeline tiền xử lý (Luồng A/B); Đóng gói model `.pkl` và Giao diện Web Demo Streamlit (`app.py`). |
+| **1871020569** | Nguyễn Hữu Tiến | CNTT 18-10 | Trưởng nhóm; Xây dựng pipeline tiền xử lý (Luồng A/B); Đóng gói model `.pkl` và Giao diện Web Dashboard (`app.py`). |
 | **1871020502** | Vương Xuân Sơn | CNTT 18-10 | Khám phá dữ liệu (EDA), thống kê mô tả, phát hiện ngoại lệ IQR, huấn luyện thuật toán K-NN & Naive Bayes. |
 | **1871020698** | Lý Triệu Trung | CNTT 18-10 | Huấn luyện Cây quyết định & Random Forest, đánh giá đa chỉ số, phân tích lỗi (Error Analysis) và phân tầng rủi ro. |
 
@@ -31,7 +31,14 @@ BTL_FIT4013_Nhom9_StudentDropout/
 │   ├── __init__.py               # Khởi tạo package src
 │   ├── utils.py                  # Cố định random_state=42, quản lý đường dẫn, phân tầng rủi ro
 │   ├── preprocessing.py          # Làm sạch dữ liệu, tạo 7 đặc trưng miền giáo dục, Luồng A & B
+│   ├── domain_labels.py          # Ánh xạ mã ngành/tuyển sinh UCI sang nhãn tiếng Việt & bộ hồ sơ mẫu
+│   ├── web_service.py            # Dịch vụ suy luận & phân tích dữ liệu phục vụ FastAPI Dashboard
 │   └── train_evaluate.py         # Huấn luyện K-NN, Naive Bayes, Decision Tree, Random Forest & vẽ biểu đồ
+│
+├── web/                          # Giao diện Web Modern Dashboard (HTML/CSS/JS + Chart.js, Light/Dark Mode)
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
 │
 ├── models/
 │   └── best_dropout_pipeline.pkl # Pipeline hoàn chỉnh (Preprocessor + Model Random Forest) tốt nhất
@@ -46,7 +53,19 @@ BTL_FIT4013_Nhom9_StudentDropout/
 │   └── BaoCao_BTL_Nhom9.pdf
 │
 ├── run_pipeline.py               # Điểm chạy chính (Entry-point): Chạy 1 lệnh ra toàn bộ kết quả
-├── app.py                        # Giao diện Web Demo tương tác bằng Streamlit (Điểm thưởng GUI)
+├── app.py                        # Giao diện Web Dashboard tương tác bằng FastAPI (chạy: python app.py)
 ├── requirements.txt              # Khai báo các thư viện Python cần thiết
 ├── AI_USAGE.md                   # Khai báo minh bạch việc sử dụng công cụ AI
 └── README.md                     # Tài liệu hướng dẫn sử dụng dự án
+```
+
+---
+
+## 🚀 Hướng dẫn Chạy Giao diện Web Mới
+
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+Sau đó mở trình duyệt tại: `http://127.0.0.1:8000`
