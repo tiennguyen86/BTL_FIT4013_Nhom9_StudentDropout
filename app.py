@@ -1,185 +1,172 @@
 # -*- coding: utf-8 -*-
 """
 Script: app.py
-Chức năng: Giao diện Web Demo (Streamlit) dự đoán sinh viên có nguy cơ bỏ học
-và phân tầng rủi ro 3 mức (Thấp - Trung bình - Cao).
+Chức năng: Giao diện Web Dashboard hiện đại (FastAPI + Modern SPA) thay thế giao diện Streamlit cũ,
+dự đoán sinh viên có nguy cơ bỏ học, phân tầng rủi ro 3 mức, mô phỏng What-If,
+sàng lọc hàng loạt CSV, đối sánh mô hình Luồng A/B và phân tích lỗi (N = 885).
+
 Cách chạy:
-    streamlit run app.py
+    python app.py
+Hoặc:
+    uvicorn app:app --host 127.0.0.1 --port 8000 --reload
 """
 
-import joblib
-import pandas as pd
-import streamlit as st
+from __future__ import annotations
 
-# Import từ src/ để joblib nhận diện đúng class DomainFeatureCreator trong pipeline
-import src.preprocessing as prep
-from src.train_evaluate import run_experiment_pipeline
-from src.utils import (
-    BEST_MODEL_PATH,
-    DATA_PATH,
-    ERROR_CSV_PATH,
-    RESULTS_CSV_PATH,
-    TUNING_CSV_PATH,
-    assign_risk_tier,
-    get_risk_recommendation,
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import uvicorn
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, Response
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
+
+from src.utils import FIGURES_DIR, PROJECT_ROOT
+from src.web_service import (
+    get_batch_sample_csv_bytes,
+    get_experiments_data,
+    get_metadata,
+    get_overview_data,
+    get_resources,
+    get_test_sample_detail,
+    get_test_samples,
+    predict_batch_csv,
+    predict_single,
 )
 
-st.set_page_config(
-    page_title="Cảnh báo sớm Sinh viên Bỏ học - Nhóm 9",
-    page_icon="🎓",
-    layout="wide",
+WEB_DIR: Path = PROJECT_ROOT / "web"
+
+
+class PredictRequest(BaseModel):
+    features: Dict[str, Any] = Field(default_factory=dict)
+    threshold: float = Field(default=0.50, ge=0.05, le=0.95)
+
+
+@asynccontextmanager
+async def lifespan(app_instance: FastAPI):
+    """Nạp sẵn dữ liệu và mô hình Random Forest Luồng B ngay khi khởi động server."""
+    get_resources()
+    yield
+
+
+app = FastAPI(
+    title="EduGuard AI — Cảnh báo sớm Sinh viên Bỏ học (FIT4013 - Nhóm 9)",
+    description="API & Web Dashboard dự đoán nguy cơ bỏ học của sinh viên sử dụng Pipeline Luồng B + Random Forest.",
+    version="2.0.0",
+    lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@st.cache_resource
-def load_model_and_data():
-    """Nạp mô hình đã huấn luyện và dữ liệu gốc (tự động chạy pipeline nếu chưa có file .pkl)."""
-    if not BEST_MODEL_PATH.exists():
-        run_experiment_pipeline()
-    model = joblib.load(BEST_MODEL_PATH)
-    df = prep.load_and_clean_data(DATA_PATH)
-    _, X_test, _, y_test = prep.split_train_test(df)
-    return model, df, X_test, y_test
+if WEB_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(WEB_DIR)), name="static")
+
+if FIGURES_DIR.exists():
+    app.mount("/figures", StaticFiles(directory=str(FIGURES_DIR)), name="figures")
 
 
-def main():
-    st.title("🎓 Hệ thống Cảnh báo sớm Sinh viên có Nguy cơ Bỏ học")
-    st.caption("Học phần: Nhập môn Học máy (FIT4013) — Nhóm 9 | Mô hình: Luồng B + Random Forest")
+@app.get("/", include_in_schema=False)
+async def serve_index():
+    """Phục vụ trang giao diện Web SPA chính."""
+    index_path = WEB_DIR / "index.html"
+    if not index_path.exists():
+        raise HTTPException(status_code=404, detail="Không tìm thấy giao diện web/index.html")
+    return FileResponse(str(index_path))
 
-    model, df, X_test, y_test = load_model_and_data()
-    feature_cols = [c for c in df.columns if c not in ("Target", "Target_Binary")]
 
-    tab1, tab2, tab3 = st.tabs([
-        "🔍 Dự đoán Hồ sơ Sinh viên",
-        "📊 Kết quả Thực nghiệm (Luồng A vs B)",
-        "⚠️ Phân tích Lỗi & Phân tầng Rủi ro",
-    ])
+@app.get("/api/health")
+async def health_check() -> Dict[str, str]:
+    return {"status": "ok", "service": "Student Dropout Prediction API"}
 
-    # ==========================================================================
-    # TAB 1: DỰ ĐOÁN TRỰC TIẾP HỒ SƠ SINH VIÊN
-    # ==========================================================================
-    with tab1:
-        col_left, col_right = st.columns([1.15, 1.0])
 
-        with col_left:
-            st.subheader("1. Chọn hoặc Nhập thông tin sinh viên")
-            mode = st.radio(
-                "Chế độ kiểm thử:",
-                ["Nhập thông số trực tiếp", "Chọn hồ sơ thực tế từ Tập kiểm thử (Test set)"],
-                horizontal=True,
-            )
+@app.get("/api/overview")
+async def api_overview() -> Dict[str, Any]:
+    return get_overview_data()
 
-            # Lấy dòng trung vị làm giá trị mặc định cho các cột phụ
-            base_row = X_test.median(numeric_only=True).to_dict()
 
-            if mode == "Chọn hồ sơ thực tế từ Tập kiểm thử (Test set)":
-                sample_idx = st.selectbox(
-                    "Chọn mã dòng sinh viên trong tập Test (N = 885):",
-                    options=list(X_test.index[:100]),
-                    format_func=lambda idx: (
-                        f"Sinh viên #{idx} — Thực tế: "
-                        f"{'BỎ HỌC (1)' if y_test.loc[idx] == 1 else 'KHÔNG BỎ HỌC (0)'}"
-                    ),
-                )
-                input_df = X_test.loc[[sample_idx]].copy()
-                actual_label = int(y_test.loc[sample_idx])
-                st.info(
-                    f"**Nhãn thực tế trong dữ liệu:** "
-                    f"{'🔴 Bỏ học (Dropout = 1)' if actual_label == 1 else '🟢 Không bỏ học (Non-Dropout = 0)'}"
-                )
-            else:
-                c1, c2 = st.columns(2)
-                with c1:
-                    enr_1 = st.number_input("Số môn đăng ký HK1", 0, 26, 6)
-                    app_1 = st.number_input("Số môn đậu HK1", 0, 26, 5)
-                    grd_1 = st.slider("Điểm trung bình HK1 (thang 0-20)", 0.0, 20.0, 12.0, 0.5)
-                    no_eval_1 = st.number_input("Số môn bỏ thi HK1", 0, 12, 0)
-                    tuition_ok = st.selectbox("Đóng học phí đúng hạn", [1, 0], format_func=lambda x: "Có (1)" if x == 1 else "Chưa đóng (0)")
-                    debtor = st.selectbox("Có nợ học phí (Debtor)", [0, 1], format_func=lambda x: "Không nợ (0)" if x == 0 else "Đang nợ (1)")
+@app.get("/api/metadata")
+async def api_metadata() -> Dict[str, Any]:
+    return get_metadata()
 
-                with c2:
-                    enr_2 = st.number_input("Số môn đăng ký HK2", 0, 23, 6)
-                    app_2 = st.number_input("Số môn đậu HK2", 0, 20, 5)
-                    grd_2 = st.slider("Điểm trung bình HK2 (thang 0-20)", 0.0, 20.0, 12.0, 0.5)
-                    no_eval_2 = st.number_input("Số môn bỏ thi HK2", 0, 12, 0)
-                    scholarship = st.selectbox("Có học bổng", [0, 1], format_func=lambda x: "Không (0)" if x == 0 else "Có học bổng (1)")
-                    age = st.number_input("Tuổi khi nhập học", 17, 70, 20)
 
-                base_row.update({
-                    "Curricular units 1st sem (enrolled)": enr_1,
-                    "Curricular units 1st sem (approved)": app_1,
-                    "Curricular units 1st sem (grade)": grd_1,
-                    "Curricular units 1st sem (without evaluations)": no_eval_1,
-                    "Curricular units 2nd sem (enrolled)": enr_2,
-                    "Curricular units 2nd sem (approved)": app_2,
-                    "Curricular units 2nd sem (grade)": grd_2,
-                    "Curricular units 2nd sem (without evaluations)": no_eval_2,
-                    "Tuition fees up to date": tuition_ok,
-                    "Debtor": debtor,
-                    "Scholarship holder": scholarship,
-                    "Age at enrollment": age,
-                })
-                input_df = pd.DataFrame([base_row])[feature_cols]
+@app.post("/api/predict")
+async def api_predict(payload: PredictRequest) -> Dict[str, Any]:
+    try:
+        return predict_single(payload.features, threshold=payload.threshold)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Lỗi dự đoán: {exc}") from exc
 
-        with col_right:
-            st.subheader("2. Kết quả Dự báo & Khuyến nghị")
-            prob = float(model.predict_proba(input_df)[0, 1])
-            pred_label = int(prob >= 0.50)
-            tier = assign_risk_tier(prob)
-            rec = get_risk_recommendation(prob)
 
-            st.metric("Xác suất Bỏ học dự đoán P(Dropout = 1)", f"{prob * 100:.2f}%")
-            st.progress(min(max(prob, 0.0), 1.0))
+@app.post("/api/predict-batch")
+async def api_predict_batch(
+    file: UploadFile = File(...),
+    threshold: float = Query(default=0.50, ge=0.05, le=0.95),
+) -> Dict[str, Any]:
+    try:
+        raw_bytes = await file.read()
+        return predict_batch_csv(raw_bytes, threshold=threshold)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Lỗi xử lý file CSV: {exc}") from exc
 
-            if prob >= 0.70:
-                st.error(f"**Mức phân tầng rủi ro:** {tier}")
-            elif prob >= 0.40:
-                st.warning(f"**Mức phân tầng rủi ro:** {tier}")
-            else:
-                st.success(f"**Mức phân tầng rủi ro:** {tier}")
 
-            st.markdown(f"**Kết luận phân lớp (ngưỡng 0.50):** `{'Dropout (1)' if pred_label == 1 else 'Non-Dropout (0)'}`")
-            st.markdown(f"**Khuyến nghị cho Cố vấn học tập:**\n> {rec}")
+@app.get("/api/batch-sample")
+async def api_batch_sample(limit: int = Query(default=25, ge=5, le=200)):
+    """Tải về file CSV mẫu (25 hồ sơ từ tập kiểm thử) để thử nghiệm sàng lọc hàng loạt."""
+    csv_bytes = get_batch_sample_csv_bytes(limit=limit)
+    return Response(
+        content=csv_bytes,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="mau_ho_so_sinh_vien.csv"'},
+    )
 
-            st.markdown("**Tóm tắt các chỉ số học tập & tài chính đã tính trong Luồng B:**")
-            engineered = prep.DomainFeatureCreator().transform(input_df)
-            show_cols = [
-                "Approval_rate_1st_sem",
-                "Approval_rate_2nd_sem",
-                "Avg_grade_both_sem",
-                "Total_approved_units",
-                "Total_without_eval",
-                "Financial_risk_score",
-            ]
-            st.dataframe(engineered[show_cols].round(3), use_container_width=True)
 
-    # ==========================================================================
-    # TAB 2: KẾT QUẢ THỰC NGHIỆM (LUỒNG A VS LUỒNG B & SIÊU THAM SỐ)
-    # ==========================================================================
-    with tab2:
-        st.subheader("Bảng đối sánh Luồng A (Cơ bản) và Luồng B (Cải tiến)")
-        if RESULTS_CSV_PATH.exists():
-            res_df = pd.read_csv(RESULTS_CSV_PATH)
-            st.dataframe(res_df, use_container_width=True)
+@app.get("/api/test-samples")
+async def api_test_samples(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=15, ge=5, le=100),
+    status: str = Query(default="ALL"),
+    tier: str = Query(default="ALL"),
+    course: Optional[int] = Query(default=None),
+    search: str = Query(default=""),
+    sort: str = Query(default="prob_desc"),
+) -> Dict[str, Any]:
+    return get_test_samples(
+        page=page,
+        page_size=page_size,
+        status_filter=status,
+        tier_filter=tier,
+        course_filter=course,
+        search=search,
+        sort_by=sort,
+    )
 
-        st.subheader("Kết quả khảo sát Siêu tham số (Hyperparameter Tuning)")
-        if TUNING_CSV_PATH.exists():
-            tun_df = pd.read_csv(TUNING_CSV_PATH)
-            st.dataframe(tun_df, use_container_width=True)
 
-    # ==========================================================================
-    # TAB 3: PHÂN TÍCH LỖI (ERROR ANALYSIS)
-    # ==========================================================================
-    with tab3:
-        st.subheader("Danh sách các trường hợp dự đoán trên tập Kiểm thử (N = 885)")
-        if ERROR_CSV_PATH.exists():
-            err_df = pd.read_csv(ERROR_CSV_PATH)
-            err_col = "Error_Type" if "Error_Type" in err_df.columns else "Prediction_Status"
-            filter_type = st.selectbox("Lọc theo trạng thái dự đoán:", ["Tất cả"] + list(err_df[err_col].unique()))
-            if filter_type != "Tất cả":
-                err_df = err_df[err_df[err_col] == filter_type]
-            st.dataframe(err_df.head(50), use_container_width=True)
+@app.get("/api/test-samples/{student_index}")
+async def api_test_sample_detail(student_index: int) -> Dict[str, Any]:
+    try:
+        return get_test_sample_detail(student_index)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get("/api/experiments")
+async def api_experiments() -> Dict[str, Any]:
+    return get_experiments_data()
 
 
 if __name__ == "__main__":
-    main()
+    print("=" * 72)
+    print("  EduGuard AI — Hệ thống Cảnh báo sớm Sinh viên Bỏ học (FIT4013)")
+    print("  Đang khởi động máy chủ Web tại: http://127.0.0.1:8000")
+    print("=" * 72)
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=False)
