@@ -3,963 +3,951 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EduGuard AI — Hệ thống Cảnh báo sớm Sinh viên có Nguy cơ Bỏ học (FIT4013)</title>
+  <title>EduGuard AI — Hệ thống Giám sát & Cảnh báo Sớm Sinh viên Bỏ học (FIT4013)</title>
   
-  <!-- Fonts: Plus Jakarta Sans for crisp modern headings & JetBrains Mono for metrics/data -->
+  <!-- Premium Typographic Stack -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   
-  <link rel="stylesheet" href="/static/styles.css" />
-  <!-- Chart.js 4.4.4 for scientific visualization -->
+  <!-- Cache-busting CSS v3.0 -->
+  <link rel="stylesheet" href="/static/styles.css?v=3.0" />
+  <!-- Chart.js 4.4.4 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <!-- Cache-busting JS v3.0 -->
+  <script src="/static/app.js?v=3.0" defer></script>
 </head>
 <body>
-  <div class="app-layout">
-    <!-- Backdrop for mobile drawer -->
-    <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
-
-    <!-- Navigation Sidebar -->
-    <aside id="sidebar" class="sidebar" aria-label="Menu điều hướng">
-      <div class="sidebar-brand">
-        <div class="brand-emblem" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-            <path d="M6 12v5c3 3 9 3 12 0v-5" />
-          </svg>
-        </div>
-        <div class="brand-meta">
-          <span class="brand-name">EduGuard AI</span>
-          <span class="brand-tag">FIT4013 • Nhóm 9</span>
-        </div>
-      </div>
-
-      <nav class="sidebar-menu">
-        <div class="menu-category">Chẩn đoán & Dự báo</div>
-        
-        <button class="nav-tab active" data-view="dashboard" id="navDashboard">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>
-          </svg>
-          <span>Tổng quan Hệ thống</span>
-        </button>
-
-        <button class="nav-tab" data-view="predictor" id="navPredictor">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-          </svg>
-          <span>Dự đoán & What-If</span>
-          <span class="tab-indicator live">Realtime</span>
-        </button>
-
-        <button class="nav-tab" data-view="batch" id="navBatch">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/>
-          </svg>
-          <span>Sàng lọc Hàng loạt CSV</span>
-        </button>
-
-        <div class="menu-category">Khoa học Dữ liệu & Đánh giá</div>
-
-        <button class="nav-tab" data-view="experiments" id="navExperiments">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-          <span>Thực nghiệm Mô hình</span>
-        </button>
-
-        <button class="nav-tab" data-view="errors" id="navErrors">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <span>Phân tích Lỗi (N = 885)</span>
-        </button>
-      </nav>
-
-      <div class="sidebar-status">
-        <div class="active-pipeline-box">
-          <div class="pipeline-header">
-            <span class="status-pulse-dot"></span>
-            <span class="pipeline-name">Random Forest • Luồng B</span>
+  <div class="observatory-app">
+    <!-- =====================================================================
+         MODERN TOP-NAV OBSERVATORY HEADER
+         ===================================================================== -->
+    <header class="observatory-header">
+      <div class="header-container">
+        <!-- Brand Cluster -->
+        <div class="brand-cluster">
+          <div class="brand-symbol">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg>
           </div>
-          <div class="pipeline-metrics">
-            <span>F1: <strong>0.8060</strong></span>
-            <span class="sep">•</span>
-            <span>AUC: <strong>0.9329</strong></span>
+          <div class="brand-identity">
+            <div class="brand-title-row">
+              <span class="brand-title">EduGuard AI</span>
+              <span class="version-tag">v3.0</span>
+            </div>
+            <span class="brand-subtitle">FIT4013 • Nhóm 9 • Cảnh báo Học vụ</span>
           </div>
         </div>
 
-        <button id="openTeamBtn" class="team-info-trigger" aria-label="Xem thành viên nhóm 9">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <span>Hồ sơ Nhóm 9 (FIT4013)</span>
-        </button>
-      </div>
-    </aside>
-
-    <!-- Main Workspace Area -->
-    <div class="workspace-area">
-      <!-- Universal Top Bar -->
-      <header class="workspace-topbar">
-        <div class="topbar-left-cluster">
-          <button id="mobileMenuBtn" class="action-icon-btn mobile-only" aria-label="Mở bảng điều hướng">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <!-- Center Navigation Tabs (Pill Switcher) -->
+        <nav class="nav-pill-switcher" aria-label="Điều hướng chính">
+          <button class="nav-pill active" data-view="dashboard" id="navDashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+            <span>Tổng quan Trạm</span>
           </button>
-          <div class="view-heading-group">
-            <h1 id="viewTitle" class="current-view-title">Tổng quan Hệ thống</h1>
-            <p id="viewSubtitle" class="current-view-sub">Cảnh báo sớm Sinh viên có Nguy cơ Bỏ học • Tập dữ liệu UCI (N = 4.424)</p>
-          </div>
-        </div>
 
-        <div class="topbar-right-cluster">
-          <div class="system-status-chip desktop-only">
-            <span class="chip-dot"></span>
-            <span>Mô hình đang hoạt động: <strong>Random Forest (Luồng B - 43 chiều)</strong></span>
+          <button class="nav-pill" data-view="predictor" id="navPredictor">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Phòng What-If</span>
+            <span class="pill-dot-live"></span>
+          </button>
+
+          <button class="nav-pill" data-view="batch" id="navBatch">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+            <span>Sàng lọc CSV</span>
+          </button>
+
+          <button class="nav-pill" data-view="experiments" id="navExperiments">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Đối sánh Mô hình</span>
+          </button>
+
+          <button class="nav-pill" data-view="errors" id="navErrors">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Phân tích Lỗi (885)</span>
+          </button>
+        </nav>
+
+        <!-- Utility Cluster (Right) -->
+        <div class="utility-cluster">
+          <div class="pipeline-pill desktop-only">
+            <span class="pulse-indicator"></span>
+            <span>Luồng B • Random Forest (F1: <strong>0.8060</strong>)</span>
           </div>
 
-          <!-- Theme switcher button -->
-          <button id="themeToggleBtn" class="theme-switch-btn" title="Chuyển chế độ Sáng / Tối (Ctrl + J)">
+          <button id="themeToggleBtn" class="theme-icon-btn" title="Chuyển chế độ Sáng / Tối (Ctrl + J)">
             <span id="themeIconLight" class="theme-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             </span>
             <span id="themeIconDark" class="theme-icon hidden">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </span>
-            <span id="themeLabel" class="desktop-only">Chế độ Tối</span>
+            <span id="themeLabel" class="desktop-only">Giao diện</span>
+          </button>
+
+          <button id="openTeamBtn" class="team-btn" title="Thông tin Đề tài & Thành viên Nhóm 9">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="desktop-only">Nhóm 9</span>
           </button>
         </div>
-      </header>
+      </div>
+    </header>
 
-      <!-- Main Scrollable Content Area -->
-      <main class="workspace-main" id="mainContent">
+    <!-- Sub-header Breadcrumb Bar -->
+    <div class="view-subbar">
+      <div class="subbar-container">
+        <div>
+          <h2 id="viewTitle" class="subbar-title">Tổng quan Hệ thống</h2>
+          <p id="viewSubtitle" class="subbar-subtitle">Cảnh báo sớm Sinh viên có Nguy cơ Bỏ học • Tập dữ liệu UCI (N = 4.424)</p>
+        </div>
+        <div class="subbar-meta desktop-only">
+          <span>Học phần: <strong>FIT4013 - Nhập môn Học máy</strong></span>
+          <span class="sep">•</span>
+          <span>GVHD: <strong>ThS. Lê Thị Thuỳ Trang</strong></span>
+        </div>
+      </div>
+    </div>
 
-        <!-- ===============================================================
-             VIEW 1: EXECUTIVE DASHBOARD OVERVIEW
-             =============================================================== -->
-        <section id="view-dashboard" class="page-view active">
-          <!-- Command Center Banner -->
-          <div class="command-banner">
-            <div class="command-content">
-              <div class="command-eyebrow">FIT4013 • NHẬP MÔN HỌC MÁY • HỌC PHẦN DỰ ÁN 2026–2027</div>
-              <h2 class="command-title">Hệ thống Giám sát & Cảnh báo sớm Rủi ro Bỏ học của Sinh viên</h2>
-              <p class="command-desc">Ứng dụng học máy phân loại nhị phân trên tập dữ liệu chuẩn UCI (4.424 sinh viên), kết hợp 7 đặc trưng miền giáo dục mới để nhận diện sớm sinh viên gặp khó khăn học vụ hoặc tài chính, hỗ trợ can thiệp phân tầng 3 mức.</p>
+    <!-- =====================================================================
+         MAIN OBSERVATORY WORKSPACE
+         ===================================================================== -->
+    <main class="observatory-body">
+
+      <!-- ===================================================================
+           VIEW 1: EXECUTIVE DASHBOARD (TRẠM GIÁM SÁT HỌC VỤ)
+           =================================================================== -->
+      <section id="view-dashboard" class="observatory-view active">
+        <!-- Hero Observatory Banner -->
+        <div class="hero-observatory-card">
+          <div class="hero-main-info">
+            <div class="hero-kicker">HỆ THỐNG TRÍ TUỆ NHẬN DIỆN NGUY CƠ BỎ HỌC • N = 4.424 HỒ SƠ UCI</div>
+            <h1 class="hero-headline">Hệ thống Giám sát & Cảnh báo sớm Rủi ro Bỏ học của Sinh viên</h1>
+            <p class="hero-summary">
+              Mô hình học máy phân loại nhị phân tối ưu (Luồng B - Random Forest) tích hợp 7 đặc trưng miền giáo dục độc quyền,
+              giúp Cố vấn học tập chủ động phát hiện sớm sinh viên gặp khó khăn và thực hiện can thiệp phân tầng 3 mức hiệu quả.
+            </p>
+          </div>
+          <div class="hero-quick-actions">
+            <button class="hero-action-btn primary" data-jump="predictor">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+              <span>Vào Phòng Mô phỏng What-If</span>
+            </button>
+            <button class="hero-action-btn secondary" data-jump="batch">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Sàng lọc Tệp Điểm CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Metric Ribbon -->
+        <div class="kpi-ribbon-grid">
+          <div class="kpi-ribbon-card">
+            <div class="kpi-top-row">
+              <span class="kpi-title">Quy mô Dữ liệu UCI</span>
+              <span class="kpi-tag-chip tag-blue">Toàn bộ</span>
             </div>
-            <div class="command-actions">
-              <button class="btn btn-primary" data-jump="predictor">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span>Chẩn đoán Hồ sơ Sinh viên</span>
-              </button>
-              <button class="btn btn-secondary" data-jump="batch">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span>Sàng lọc Tệp CSV Hàng loạt</span>
-              </button>
-            </div>
+            <div id="kpiTotalStudents" class="kpi-mega-number">4,424</div>
+            <div id="kpiSplitMeta" class="kpi-detail-note">Train: 3,539 (80%) • Test: 885 (20%)</div>
           </div>
 
-          <!-- KPI Metric Cards Grid -->
-          <div class="metric-tiles-grid">
-            <div class="metric-tile">
-              <div class="tile-header">
-                <span class="tile-label">Quy mô Dữ liệu UCI</span>
-                <span class="tile-badge badge-blue">Tổng thể</span>
-              </div>
-              <div id="kpiTotalStudents" class="tile-number">4,424</div>
-              <div id="kpiSplitMeta" class="tile-sub">Huấn luyện: 3,539 (80%) • Kiểm thử: 885 (20%)</div>
+          <div class="kpi-ribbon-card">
+            <div class="kpi-top-row">
+              <span class="kpi-title">Tỷ lệ Bỏ học Thực tế</span>
+              <span class="kpi-tag-chip tag-crimson">Lớp dương (1)</span>
             </div>
-
-            <div class="metric-tile">
-              <div class="tile-header">
-                <span class="tile-label">Tỷ lệ Bỏ học (Dropout)</span>
-                <span class="tile-badge badge-red">Lớp dương (1)</span>
-              </div>
-              <div id="kpiDropoutRate" class="tile-number text-crimson">32.12%</div>
-              <div id="kpiDropoutCount" class="tile-sub">1,421 ca bỏ học / 3,003 an toàn</div>
-            </div>
-
-            <div class="metric-tile">
-              <div class="tile-header">
-                <span class="tile-label">Hiệu năng F1-Score Tối ưu</span>
-                <span class="tile-badge badge-emerald">Luồng B</span>
-              </div>
-              <div id="kpiBestF1" class="tile-number text-emerald">0.8060</div>
-              <div id="kpiBestModelMeta" class="tile-sub">Random Forest • Độ chính xác: 88.36%</div>
-            </div>
-
-            <div class="metric-tile">
-              <div class="tile-header">
-                <span class="tile-label">Độ phân tách ROC-AUC</span>
-                <span class="tile-badge badge-amber">Tập Kiểm thử</span>
-              </div>
-              <div id="kpiBestAuc" class="tile-number text-amber">0.9329</div>
-              <div id="kpiBestPrAuc" class="tile-sub">PR-AUC: 0.9023 • Độ nhạy (Recall): 75.35%</div>
-            </div>
+            <div id="kpiDropoutRate" class="kpi-mega-number text-crimson">32.12%</div>
+            <div id="kpiDropoutCount" class="kpi-detail-note">1,421 ca bỏ học / 3,003 an toàn</div>
           </div>
 
-          <!-- Section: Analytics & Evaluation Dual Column -->
-          <div class="grid-layout-2">
-            <!-- Target Distribution Chart Card -->
-            <div class="panel-card">
-              <div class="panel-card-header">
-                <div>
-                  <h3 class="panel-title">Phân phối Trạng thái Sinh viên (Dữ liệu Gốc)</h3>
-                  <p class="panel-sub">3 nhãn ban đầu được quy đổi nhị phân: Dropout (1) vs Non-Dropout (0)</p>
-                </div>
-                <span class="panel-tag">Khảo sát EDA</span>
-              </div>
-              <div class="chart-box h-260">
-                <canvas id="chartTargetDist"></canvas>
-              </div>
+          <div class="kpi-ribbon-card">
+            <div class="kpi-top-row">
+              <span class="kpi-title">F1-Score Mô hình Tối ưu</span>
+              <span class="kpi-tag-chip tag-emerald">Luồng B</span>
             </div>
-
-            <!-- Financial Impact Chart Card -->
-            <div class="panel-card">
-              <div class="panel-card-header">
-                <div>
-                  <h3 class="panel-title">Tác động Tài chính & Học bổng tới Nguy cơ Bỏ học</h3>
-                  <p class="panel-sub">Tỷ lệ bỏ học thực tế (%) dựa theo tình trạng đóng học phí và học bổng</p>
-                </div>
-                <span class="panel-tag tag-warning">Cảnh báo Tài chính</span>
-              </div>
-              <div class="chart-box h-260">
-                <canvas id="chartFinancialImpact"></canvas>
-              </div>
-            </div>
+            <div id="kpiBestF1" class="kpi-mega-number text-emerald">0.8060</div>
+            <div id="kpiBestModelMeta" class="kpi-detail-note">Random Forest • Độ chính xác: 88.36%</div>
           </div>
 
-          <!-- Section: Feature Importance & Confusion Matrix Matrix -->
-          <div class="grid-layout-wide-2">
+          <div class="kpi-ribbon-card">
+            <div class="kpi-top-row">
+              <span class="kpi-title">Độ phân tách ROC-AUC</span>
+              <span class="kpi-tag-chip tag-amber">Tập Kiểm thử</span>
+            </div>
+            <div id="kpiBestAuc" class="kpi-mega-number text-amber">0.9329</div>
+            <div id="kpiBestPrAuc" class="kpi-detail-note">PR-AUC: 0.9023 • Recall: 75.35%</div>
+          </div>
+        </div>
+
+        <!-- Observatory Main Layout (2/3 vs 1/3) -->
+        <div class="observatory-split-layout">
+          <!-- Left Main Column (Deep Analytics) -->
+          <div class="observatory-main-col">
             <!-- Feature Importance -->
-            <div class="panel-card">
-              <div class="panel-card-header">
+            <div class="data-panel">
+              <div class="data-panel-header">
                 <div>
-                  <h3 class="panel-title">Top 12 Đặc trưng Tác động Lớn nhất (Random Forest • Luồng B)</h3>
-                  <p class="panel-sub">Đặc trưng có nhãn màu xanh nổi bật là các biến tri thức miền giáo dục được tạo mới</p>
+                  <h3 class="data-panel-title">Tầm quan trọng Đặc trưng (Random Forest • Luồng B)</h3>
+                  <p class="data-panel-desc">Các cột có màu xanh nổi bật đại diện cho 7 đặc trưng miền giáo dục được nhóm 9 kiến tạo mới</p>
                 </div>
-                <span class="panel-tag tag-success">Đóng góp Đặc trưng</span>
+                <span class="data-panel-badge badge-blue">43 Chiều đặc trưng</span>
               </div>
-              <div class="chart-box h-340">
+              <div class="chart-container-box h-340">
                 <canvas id="chartFeatureImportance"></canvas>
               </div>
             </div>
 
-            <!-- Confusion Matrix & Risk Tier Breakdown -->
-            <div class="panel-card">
-              <div class="panel-card-header">
+            <!-- Confusion Matrix & Risk Distribution -->
+            <div class="data-panel">
+              <div class="data-panel-header">
                 <div>
-                  <h3 class="panel-title">Phân tầng Rủi ro & Ma trận Nhầm lẫn</h3>
-                  <p class="panel-sub">Đánh giá khả năng phát hiện trên 885 sinh viên tập kiểm thử</p>
+                  <h3 class="data-panel-title">Ma trận Nhầm lẫn & Đánh giá Ngưỡng Quyết định</h3>
+                  <p class="data-panel-desc">Kiểm chứng độ nhạy phân loại trên 885 sinh viên tập kiểm thử độc lập</p>
                 </div>
-                <div class="segmented-control-mini" id="cmThresholdToggle">
-                  <button class="seg-btn active" data-th="0.50">Ngưỡng 0.50 (Chuẩn)</button>
-                  <button class="seg-btn" data-th="0.40">Ngưỡng 0.40 (Nhạy cao)</button>
-                </div>
-              </div>
-
-              <!-- 2x2 Interactive Confusion Matrix -->
-              <div class="confusion-matrix-display" id="confusionMatrixBox">
-                <div class="cm-cell cell-tn">
-                  <div class="cm-header">True Negative (TN)</div>
-                  <div id="cmTn" class="cm-value">—</div>
-                  <div class="cm-desc">Đoán đúng: Sinh viên an toàn</div>
-                </div>
-                <div class="cm-cell cell-fp">
-                  <div class="cm-header">False Positive (FP)</div>
-                  <div id="cmFp" class="cm-value">—</div>
-                  <div class="cm-desc">Báo nhầm: Thực tế không bỏ học</div>
-                </div>
-                <div class="cm-cell cell-fn">
-                  <div class="cm-header">False Negative (FN)</div>
-                  <div id="cmFn" class="cm-value">—</div>
-                  <div class="cm-desc">Bỏ sót: Nguy cơ nhưng không phát hiện</div>
-                </div>
-                <div class="cm-cell cell-tp">
-                  <div class="cm-header">True Positive (TP)</div>
-                  <div id="cmTp" class="cm-value">—</div>
-                  <div class="cm-desc">Bắt đúng: Nguy cơ bỏ học thực tế</div>
+                <div class="segmented-threshold-toggle" id="cmThresholdToggle">
+                  <button class="thresh-btn active" data-th="0.50">Ngưỡng 0.50 (Chuẩn)</button>
+                  <button class="thresh-btn" data-th="0.40">Ngưỡng 0.40 (Nhạy cao)</button>
                 </div>
               </div>
 
-              <!-- Metrics Strip (Accuracy, Recall, Precision, F1) -->
-              <div id="cmMetricsStrip" class="metrics-evaluation-strip"></div>
+              <!-- 2x2 Confusion Matrix Visualizer -->
+              <div class="confusion-grid-box" id="confusionMatrixBox">
+                <div class="matrix-cell cell-tn">
+                  <div class="matrix-cell-label">True Negative (TN)</div>
+                  <div id="cmTn" class="matrix-cell-val">—</div>
+                  <div class="matrix-cell-caption">Dự đoán đúng: Sinh viên tiếp tục học</div>
+                </div>
+                <div class="matrix-cell cell-fp">
+                  <div class="matrix-cell-label">False Positive (FP)</div>
+                  <div id="cmFp" class="matrix-cell-val">—</div>
+                  <div class="matrix-cell-caption">Báo nhầm: Thực tế sinh viên an toàn</div>
+                </div>
+                <div class="matrix-cell cell-fn">
+                  <div class="matrix-cell-label">False Negative (FN)</div>
+                  <div id="cmFn" class="matrix-cell-val">—</div>
+                  <div class="matrix-cell-caption">Bỏ sót nguy cơ: Thực tế đã bỏ học</div>
+                </div>
+                <div class="matrix-cell cell-tp">
+                  <div class="matrix-cell-label">True Positive (TP)</div>
+                  <div id="cmTp" class="matrix-cell-val">—</div>
+                  <div class="matrix-cell-caption">Bắt trúng: Sinh viên có nguy cơ bỏ học</div>
+                </div>
+              </div>
 
-              <!-- Risk Tiers Distribution (N = 885) -->
-              <h4 class="sub-panel-title">Phân bố 3 Tầng Rủi ro thực tế trên Tập Kiểm thử (N = 885)</h4>
-              <div id="riskTierBars" class="risk-tier-bars-wrap"></div>
+              <!-- Strip of 4 metrics -->
+              <div id="cmMetricsStrip" class="matrix-metrics-strip"></div>
+
+              <!-- Risk Tier Distribution Bars -->
+              <div class="tier-distribution-block">
+                <h4 class="tier-dist-heading">Phân bố 3 Tầng Rủi ro thực tế trên Tập Kiểm thử (N = 885)</h4>
+                <div id="riskTierBars" class="tier-bars-wrapper"></div>
+              </div>
             </div>
           </div>
 
-          <!-- Section: Course Leaderboard -->
-          <div class="panel-card">
-            <div class="panel-card-header">
-              <div>
-                <h3 class="panel-title">Tỷ lệ Sinh viên Bỏ học theo Ngành Đào tạo Phổ biến</h3>
-                <p class="panel-sub">Thống kê trên Top 8 ngành có lượng sinh viên tuyển sinh lớn nhất trong dữ liệu</p>
+          <!-- Right Sidebar Column (Distributions & Vulnerabilities) -->
+          <div class="observatory-side-col">
+            <!-- Target Distribution Chart -->
+            <div class="data-panel">
+              <div class="data-panel-header">
+                <div>
+                  <h3 class="data-panel-title">Phân phối Trạng thái Gốc</h3>
+                  <p class="data-panel-desc">3 nhãn gốc quy về nhị phân</p>
+                </div>
+                <span class="data-panel-badge">EDA</span>
               </div>
-              <span class="panel-tag">Thống kê Học vụ</span>
+              <div class="chart-container-box h-240">
+                <canvas id="chartTargetDist"></canvas>
+              </div>
             </div>
-            <div id="courseStatsGrid" class="course-stats-container"></div>
+
+            <!-- Financial Impact Bar Chart -->
+            <div class="data-panel">
+              <div class="data-panel-header">
+                <div>
+                  <h3 class="data-panel-title">Tác động Tài chính & Học bổng</h3>
+                  <p class="data-panel-desc">Tỷ lệ bỏ học thực tế (%)</p>
+                </div>
+                <span class="data-panel-badge badge-crimson">Cực kỳ quan trọng</span>
+              </div>
+              <div class="chart-container-box h-240">
+                <canvas id="chartFinancialImpact"></canvas>
+              </div>
+            </div>
+
+            <!-- Course Leaderboard -->
+            <div class="data-panel">
+              <div class="data-panel-header">
+                <div>
+                  <h3 class="data-panel-title">Nguy cơ theo Ngành Đào tạo</h3>
+                  <p class="data-panel-desc">Top ngành quy mô lớn</p>
+                </div>
+                <span class="data-panel-badge">Học vụ</span>
+              </div>
+              <div id="courseStatsGrid" class="course-list-stack"></div>
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- ===============================================================
-             VIEW 2: PREDICTIVE STUDIO & WHAT-IF INTERVENTION SIMULATOR
-             =============================================================== -->
-        <section id="view-predictor" class="page-view">
-          <!-- Preset Profiles Toolbar -->
-          <div class="preset-toolbar-card">
-            <div class="toolbar-cluster">
-              <span class="cluster-label">Nạp nhanh Hồ sơ Tiêu biểu:</span>
-              <div id="presetButtons" class="preset-pill-list"></div>
-            </div>
-            <div class="toolbar-cluster">
-              <span class="cluster-label">Từ Tập Kiểm thử:</span>
-              <select id="testSampleSelect" class="form-control select-compact">
-                <option value="">-- Chọn sinh viên từ tập Test (N=885) --</option>
-              </select>
-              <button id="resetMedianBtn" class="btn btn-outline btn-sm" title="Khôi phục toàn bộ trường về trung vị tập dữ liệu">
-                Đặt lại Trung vị
-              </button>
-              <label class="toggle-switch-label" title="Tự động tính toán lại xác suất bỏ học ngay khi thay đổi bất kỳ trường nào">
-                <input type="checkbox" id="autoPredictToggle" checked />
-                <span>What-If Tức thì</span>
-              </label>
-            </div>
+      <!-- ===================================================================
+           VIEW 2: PREDICTIVE STUDIO & WHAT-IF INTERVENTION LAB
+           =================================================================== -->
+      <section id="view-predictor" class="observatory-view">
+        <!-- Interactive Scenario Toolbar -->
+        <div class="scenario-toolbar-panel">
+          <div class="scenario-cluster">
+            <span class="scenario-label">Hồ sơ Giả lập Tiêu biểu:</span>
+            <div id="presetButtons" class="preset-cards-row"></div>
           </div>
+          <div class="scenario-cluster">
+            <span class="scenario-label">Từ Tập Test (N=885):</span>
+            <select id="testSampleSelect" class="form-input select-styled">
+              <option value="">-- Chọn sinh viên kiểm thử --</option>
+            </select>
+            <button id="resetMedianBtn" class="btn btn-ghost-light btn-sm" title="Khôi phục thông số về trung vị">
+              Đặt lại Trung vị
+            </button>
+            <label class="instant-whatif-toggle" title="Tự động tính toán lại xác suất bỏ học ngay khi thay đổi giá trị">
+              <input type="checkbox" id="autoPredictToggle" checked />
+              <span>What-If Tức thì</span>
+            </label>
+          </div>
+        </div>
 
-          <!-- Banner showing actual ground truth if student was loaded from test set -->
-          <div id="selectedTestActualBanner" class="actual-truth-banner hidden"></div>
+        <!-- Ground Truth Match Banner -->
+        <div id="selectedTestActualBanner" class="ground-truth-alert hidden"></div>
 
-          <!-- Two Column Ergonomic Studio Layout -->
-          <div class="predictor-studio-layout">
-            <!-- Left Column: Form Controls (Input Data) -->
-            <div class="predictor-inputs-col">
-              <!-- Academic Progress HK1 & HK2 -->
-              <div class="panel-card">
-                <div class="panel-card-header">
-                  <div>
-                    <h3 class="panel-title">1. Kết quả Học vụ (Học kỳ 1 & Học kỳ 2)</h3>
-                    <p class="panel-sub">Nhóm đặc trưng có tỷ trọng tác động lớn nhất tới dự báo mô hình</p>
+        <!-- Dual Column Laboratory Layout -->
+        <div class="predictor-lab-grid">
+          <!-- Left Column: Comprehensive Student Dossier -->
+          <div class="lab-inputs-column">
+            <!-- 1. Academic Performance (Semesters 1 & 2) -->
+            <div class="data-panel">
+              <div class="data-panel-header">
+                <div>
+                  <h3 class="data-panel-title">1. Kết quả Học vụ (Học kỳ 1 & Học kỳ 2)</h3>
+                  <p class="data-panel-desc">Nhóm đặc trưng quyết định 60%+ trọng số rủi ro bỏ học của sinh viên</p>
+                </div>
+                <span class="data-panel-badge badge-blue">Tiến độ Học vụ</span>
+              </div>
+
+              <div class="semesters-side-by-side">
+                <!-- Semester 1 Block -->
+                <div class="sem-dossier-box">
+                  <div class="sem-box-head">
+                    <span class="sem-box-title">Học kỳ 1 (HK1)</span>
+                    <span class="sem-box-tag">Khởi động</span>
                   </div>
-                  <span class="panel-tag tag-blue">Tiến độ Học vụ</span>
+                  <div class="field-duo-grid">
+                    <label class="form-field-item">
+                      <span class="field-caption">Môn đăng ký HK1</span>
+                      <input type="number" class="form-input pred-input" data-field="Curricular units 1st sem (enrolled)" min="0" max="26" step="1" />
+                    </label>
+                    <label class="form-field-item">
+                      <span class="field-caption">Lượt dự thi HK1</span>
+                      <input type="number" class="form-input pred-input" data-field="Curricular units 1st sem (evaluations)" min="0" max="45" step="1" />
+                    </label>
+                    <label class="form-field-item">
+                      <span class="field-caption">Môn đậu HK1</span>
+                      <input type="number" class="form-input pred-input" data-field="Curricular units 1st sem (approved)" min="0" max="26" step="1" />
+                    </label>
+                    <label class="form-field-item">
+                      <span class="field-caption">Môn bỏ thi HK1</span>
+                      <input type="number" class="form-input pred-input" data-field="Curricular units 1st sem (without evaluations)" min="0" max="12" step="1" />
+                    </label>
+                  </div>
+                  <div class="slider-interactive-box">
+                    <div class="slider-meta-row">
+                      <span>Điểm trung bình HK1 (thang 0–20):</span>
+                      <strong id="grade1Val" class="slider-number-badge">12.0</strong>
+                    </div>
+                    <input type="range" class="slider-range-bar pred-input" data-field="Curricular units 1st sem (grade)" data-display="grade1Val" min="0" max="20" step="0.25" />
+                  </div>
                 </div>
 
-                <div class="semesters-dual-grid">
-                  <!-- Semester 1 Card -->
-                  <div class="sem-card">
-                    <div class="sem-header">
-                      <span class="sem-title">Học kỳ 1 (HK1)</span>
-                      <span class="sem-badge">Giai đoạn Đầu khóa</span>
-                    </div>
-                    <div class="form-row-2">
-                      <label class="input-field-group">
-                        <span class="field-title">Số môn đăng ký HK1</span>
-                        <input type="number" class="form-control pred-input" data-field="Curricular units 1st sem (enrolled)" min="0" max="26" step="1" />
-                      </label>
-                      <label class="input-field-group">
-                        <span class="field-title">Số lượt dự thi HK1</span>
-                        <input type="number" class="form-control pred-input" data-field="Curricular units 1st sem (evaluations)" min="0" max="45" step="1" />
-                      </label>
-                      <label class="input-field-group">
-                        <span class="field-title">Số môn đậu HK1</span>
-                        <input type="number" class="form-control pred-input" data-field="Curricular units 1st sem (approved)" min="0" max="26" step="1" />
-                      </label>
-                      <label class="input-field-group">
-                        <span class="field-title">Số môn bỏ thi HK1</span>
-                        <input type="number" class="form-control pred-input" data-field="Curricular units 1st sem (without evaluations)" min="0" max="12" step="1" />
-                      </label>
-                    </div>
-                    <div class="slider-field-wrap">
-                      <div class="slider-title-row">
-                        <span>Điểm trung bình HK1 (Thang 0–20):</span>
-                        <strong id="grade1Val" class="numeric-val">12.0</strong>
-                      </div>
-                      <input type="range" class="form-range-slider pred-input" data-field="Curricular units 1st sem (grade)" data-display="grade1Val" min="0" max="20" step="0.25" />
-                    </div>
+                <!-- Semester 2 Block -->
+                <div class="sem-dossier-box">
+                  <div class="sem-box-head">
+                    <span class="sem-box-title">Học kỳ 2 (HK2)</span>
+                    <span class="sem-box-tag highlight">Bản lề Quyết định</span>
                   </div>
-
-                  <!-- Semester 2 Card -->
-                  <div class="sem-card">
-                    <div class="sem-header">
-                      <span class="sem-title">Học kỳ 2 (HK2)</span>
-                      <span class="sem-badge">Giai đoạn Bản lề</span>
+                  <div class="field-duo-grid">
+                    <label class="form-field-item">
+                      <span class="field-caption">Môn đăng ký HK2</span>
+                      <input type="number" class="form-input pred-input" data-field="Curricular units 2nd sem (enrolled)" min="0" max="23" step="1" />
+                    </label>
+                    <label class="form-field-item">
+                      <span class="field-caption">Lượt dự thi HK2</span>
+                      <input type="number" class="form-input pred-input" data-field="Curricular units 2nd sem (evaluations)" min="0" max="33" step="1" />
+                    </label>
+                    <label class="form-field-item">
+                      <span class="field-caption">Môn đậu HK2</span>
+                      <input type="number" class="form-input pred-input" data-field="Curricular units 2nd sem (approved)" min="0" max="20" step="1" />
+                    </label>
+                    <label class="form-field-item">
+                      <span class="field-caption">Môn bỏ thi HK2</span>
+                      <input type="number" class="form-input pred-input" data-field="Curricular units 2nd sem (without evaluations)" min="0" max="12" step="1" />
+                    </label>
+                  </div>
+                  <div class="slider-interactive-box">
+                    <div class="slider-meta-row">
+                      <span>Điểm trung bình HK2 (thang 0–20):</span>
+                      <strong id="grade2Val" class="slider-number-badge highlight">12.0</strong>
                     </div>
-                    <div class="form-row-2">
-                      <label class="input-field-group">
-                        <span class="field-title">Số môn đăng ký HK2</span>
-                        <input type="number" class="form-control pred-input" data-field="Curricular units 2nd sem (enrolled)" min="0" max="23" step="1" />
-                      </label>
-                      <label class="input-field-group">
-                        <span class="field-title">Số lượt dự thi HK2</span>
-                        <input type="number" class="form-control pred-input" data-field="Curricular units 2nd sem (evaluations)" min="0" max="33" step="1" />
-                      </label>
-                      <label class="input-field-group">
-                        <span class="field-title">Số môn đậu HK2</span>
-                        <input type="number" class="form-control pred-input" data-field="Curricular units 2nd sem (approved)" min="0" max="20" step="1" />
-                      </label>
-                      <label class="input-field-group">
-                        <span class="field-title">Số môn bỏ thi HK2</span>
-                        <input type="number" class="form-control pred-input" data-field="Curricular units 2nd sem (without evaluations)" min="0" max="12" step="1" />
-                      </label>
-                    </div>
-                    <div class="slider-field-wrap">
-                      <div class="slider-title-row">
-                        <span>Điểm trung bình HK2 (Thang 0–20):</span>
-                        <strong id="grade2Val" class="numeric-val">12.0</strong>
-                      </div>
-                      <input type="range" class="form-range-slider pred-input" data-field="Curricular units 2nd sem (grade)" data-display="grade2Val" min="0" max="20" step="0.25" />
-                    </div>
+                    <input type="range" class="slider-range-bar pred-input" data-field="Curricular units 2nd sem (grade)" data-display="grade2Val" min="0" max="20" step="0.25" />
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Financial Status & Scholarship -->
-              <div class="panel-card">
-                <div class="panel-card-header">
-                  <div>
-                    <h3 class="panel-title">2. Tình trạng Tài chính & Học bổng Sinh viên</h3>
-                    <p class="panel-sub">Trực tiếp cấu thành biến <code>Financial_risk_score</code> trong mô hình Luồng B</p>
+            <!-- 2. Financial Vulnerability Status -->
+            <div class="data-panel">
+              <div class="data-panel-header">
+                <div>
+                  <h3 class="data-panel-title">2. Tình trạng Tài chính & Học bổng</h3>
+                  <p class="data-panel-desc">Cấu thành chỉ số <code>Financial_risk_score</code> trong mô hình Luồng B</p>
+                </div>
+                <span class="data-panel-badge badge-amber">Tài chính</span>
+              </div>
+
+              <div class="financial-toggle-matrix">
+                <div class="toggle-card-item">
+                  <span class="toggle-card-label">Đóng học phí đúng hạn</span>
+                  <div class="segmented-control" data-field="Tuition fees up to date">
+                    <button type="button" class="seg-item active" data-val="1">Đã đóng đủ (1)</button>
+                    <button type="button" class="seg-item" data-val="0">Chưa đóng (0)</button>
                   </div>
-                  <span class="panel-tag tag-warning">Tài chính & Học phí</span>
                 </div>
 
-                <div class="financial-switches-grid">
-                  <div class="switch-item">
-                    <span class="switch-title">Hoàn thành học phí đúng hạn</span>
-                    <div class="segmented-control" data-field="Tuition fees up to date">
-                      <button type="button" class="seg-item active" data-val="1">Đã đóng đủ (1)</button>
-                      <button type="button" class="seg-item" data-val="0">Chưa đóng (0)</button>
-                    </div>
+                <div class="toggle-card-item">
+                  <span class="toggle-card-label">Nợ tồn đọng (Debtor)</span>
+                  <div class="segmented-control" data-field="Debtor">
+                    <button type="button" class="seg-item active" data-val="0">Không nợ (0)</button>
+                    <button type="button" class="seg-item" data-val="1">Đang nợ phí (1)</button>
                   </div>
+                </div>
 
-                  <div class="switch-item">
-                    <span class="switch-title">Tình trạng nợ học phí (Debtor)</span>
-                    <div class="segmented-control" data-field="Debtor">
-                      <button type="button" class="seg-item active" data-val="0">Không nợ (0)</button>
-                      <button type="button" class="seg-item" data-val="1">Đang nợ phí (1)</button>
-                    </div>
-                  </div>
-
-                  <div class="switch-item">
-                    <span class="switch-title">Học bổng sinh viên (Scholarship)</span>
-                    <div class="segmented-control" data-field="Scholarship holder">
-                      <button type="button" class="seg-item active" data-val="0">Không có (0)</button>
-                      <button type="button" class="seg-item" data-val="1">Có học bổng (1)</button>
-                    </div>
+                <div class="toggle-card-item">
+                  <span class="toggle-card-label">Học bổng Khuyến khích</span>
+                  <div class="segmented-control" data-field="Scholarship holder">
+                    <button type="button" class="seg-item active" data-val="0">Không có (0)</button>
+                    <button type="button" class="seg-item" data-val="1">Có học bổng (1)</button>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Demographics & Course Selection -->
-              <div class="panel-card">
-                <div class="panel-card-header">
-                  <div>
-                    <h3 class="panel-title">3. Thông tin Tuyển sinh & Nhân khẩu học</h3>
-                    <p class="panel-sub">Ngành học, độ tuổi, điểm trúng tuyển và bối cảnh sinh viên</p>
-                  </div>
-                  <span class="panel-tag">Hồ sơ Cá nhân</span>
+            <!-- 3. Demographics & Context -->
+            <div class="data-panel">
+              <div class="data-panel-header">
+                <div>
+                  <h3 class="data-panel-title">3. Thông tin Tuyển sinh & Bối cảnh Cá nhân</h3>
+                  <p class="data-panel-desc">Ngành đào tạo, độ tuổi, điểm trúng tuyển và các yếu tố nhân khẩu</p>
                 </div>
+                <span class="data-panel-badge">Bối cảnh</span>
+              </div>
 
-                <div class="form-row-3">
-                  <label class="input-field-group span-2">
-                    <span class="field-title">Ngành đào tạo</span>
-                    <select class="form-control pred-input" data-field="Course" id="selectCourse"></select>
+              <div class="demographic-fields-grid">
+                <label class="form-field-item span-2">
+                  <span class="field-caption">Ngành đào tạo</span>
+                  <select class="form-input pred-input" data-field="Course" id="selectCourse"></select>
+                </label>
+                <label class="form-field-item">
+                  <span class="field-caption">Tuổi khi nhập học</span>
+                  <input type="number" class="form-input pred-input" data-field="Age at enrollment" min="17" max="70" step="1" />
+                </label>
+                <label class="form-field-item">
+                  <span class="field-caption">Điểm xét tuyển đầu vào</span>
+                  <input type="number" class="form-input pred-input" data-field="Admission grade" min="95" max="190" step="0.5" />
+                </label>
+                <label class="form-field-item">
+                  <span class="field-caption">Điểm học lực trước ĐH</span>
+                  <input type="number" class="form-input pred-input" data-field="Previous qualification (grade)" min="95" max="190" step="0.5" />
+                </label>
+                <label class="form-field-item">
+                  <span class="field-caption">Hệ đào tạo</span>
+                  <select class="form-input pred-input" data-field="Daytime/evening attendance">
+                    <option value="1">Ban ngày (1)</option>
+                    <option value="0">Buổi tối (0)</option>
+                  </select>
+                </label>
+                <label class="form-field-item">
+                  <span class="field-caption">Giới tính</span>
+                  <select class="form-input pred-input" data-field="Gender">
+                    <option value="0">Nữ (0)</option>
+                    <option value="1">Nam (1)</option>
+                  </select>
+                </label>
+                <label class="form-field-item">
+                  <span class="field-caption">Sinh viên xa nhà</span>
+                  <select class="form-input pred-input" data-field="Displaced">
+                    <option value="1">Có (1)</option>
+                    <option value="0">Không (0)</option>
+                  </select>
+                </label>
+                <label class="form-field-item">
+                  <span class="field-caption">Tình trạng hôn nhân</span>
+                  <select class="form-input pred-input" data-field="Marital status" id="selectMarital"></select>
+                </label>
+              </div>
+
+              <!-- Collapsible Macroeconomics Accordion -->
+              <details class="macro-accordion">
+                <summary class="macro-summary">
+                  <span>Mở rộng Thông số Tuyển sinh & Kinh tế vĩ mô (9 biến phụ)</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="demographic-fields-grid macro-content">
+                  <label class="form-field-item span-2">
+                    <span class="field-caption">Phương thức xét tuyển</span>
+                    <select class="form-input pred-input" data-field="Application mode" id="selectAppMode"></select>
                   </label>
-                  <label class="input-field-group">
-                    <span class="field-title">Tuổi khi nhập học</span>
-                    <input type="number" class="form-control pred-input" data-field="Age at enrollment" min="17" max="70" step="1" />
+                  <label class="form-field-item">
+                    <span class="field-caption">Thứ tự nguyện vọng</span>
+                    <input type="number" class="form-input pred-input" data-field="Application order" min="0" max="9" step="1" />
                   </label>
-                  <label class="input-field-group">
-                    <span class="field-title">Điểm xét tuyển đầu vào</span>
-                    <input type="number" class="form-control pred-input" data-field="Admission grade" min="95" max="190" step="0.5" />
+                  <label class="form-field-item span-2">
+                    <span class="field-caption">Trình độ trước Đại học</span>
+                    <select class="form-input pred-input" data-field="Previous qualification" id="selectPrevQual"></select>
                   </label>
-                  <label class="input-field-group">
-                    <span class="field-title">Điểm học lực trước ĐH</span>
-                    <input type="number" class="form-control pred-input" data-field="Previous qualification (grade)" min="95" max="190" step="0.5" />
-                  </label>
-                  <label class="input-field-group">
-                    <span class="field-title">Hệ học</span>
-                    <select class="form-control pred-input" data-field="Daytime/evening attendance">
-                      <option value="1">Ban ngày (1)</option>
-                      <option value="0">Buổi tối (0)</option>
-                    </select>
-                  </label>
-                  <label class="input-field-group">
-                    <span class="field-title">Giới tính</span>
-                    <select class="form-control pred-input" data-field="Gender">
-                      <option value="0">Nữ (0)</option>
-                      <option value="1">Nam (1)</option>
-                    </select>
-                  </label>
-                  <label class="input-field-group">
-                    <span class="field-title">Sinh viên xa nhà</span>
-                    <select class="form-control pred-input" data-field="Displaced">
-                      <option value="1">Có (1)</option>
+                  <label class="form-field-item">
+                    <span class="field-caption">Sinh viên quốc tế</span>
+                    <select class="form-input pred-input" data-field="International">
                       <option value="0">Không (0)</option>
+                      <option value="1">Có (1)</option>
                     </select>
                   </label>
-                  <label class="input-field-group">
-                    <span class="field-title">Tình trạng hôn nhân</span>
-                    <select class="form-control pred-input" data-field="Marital status" id="selectMarital"></select>
+                  <label class="form-field-item">
+                    <span class="field-caption">Tỷ lệ thất nghiệp (%)</span>
+                    <input type="number" class="form-input pred-input" data-field="Unemployment rate" step="0.1" />
+                  </label>
+                  <label class="form-field-item">
+                    <span class="field-caption">Tỷ lệ lạm phát (%)</span>
+                    <input type="number" class="form-input pred-input" data-field="Inflation rate" step="0.1" />
+                  </label>
+                  <label class="form-field-item">
+                    <span class="field-caption">Tăng trưởng GDP (%)</span>
+                    <input type="number" class="form-input pred-input" data-field="GDP" step="0.01" />
                   </label>
                 </div>
+              </details>
 
-                <!-- Advanced Details Accordion -->
-                <details class="advanced-accordion">
-                  <summary class="accordion-summary">
-                    <span>Mở rộng thông số Tuyển sinh & Kinh tế vĩ mô (9 biến phụ)</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                  </summary>
-                  <div class="form-row-3 accordion-content">
-                    <label class="input-field-group span-2">
-                      <span class="field-title">Phương thức xét tuyển</span>
-                      <select class="form-control pred-input" data-field="Application mode" id="selectAppMode"></select>
-                    </label>
-                    <label class="input-field-group">
-                      <span class="field-title">Thứ tự nguyện vọng</span>
-                      <input type="number" class="form-control pred-input" data-field="Application order" min="0" max="9" step="1" />
-                    </label>
-                    <label class="input-field-group span-2">
-                      <span class="field-title">Trình độ trước Đại học</span>
-                      <select class="form-control pred-input" data-field="Previous qualification" id="selectPrevQual"></select>
-                    </label>
-                    <label class="input-field-group">
-                      <span class="field-title">Sinh viên quốc tế</span>
-                      <select class="form-control pred-input" data-field="International">
-                        <option value="0">Không (0)</option>
-                        <option value="1">Có (1)</option>
-                      </select>
-                    </label>
-                    <label class="input-field-group">
-                      <span class="field-title">Tỷ lệ thất nghiệp (%)</span>
-                      <input type="number" class="form-control pred-input" data-field="Unemployment rate" step="0.1" />
-                    </label>
-                    <label class="input-field-group">
-                      <span class="field-title">Tỷ lệ lạm phát (%)</span>
-                      <input type="number" class="form-control pred-input" data-field="Inflation rate" step="0.1" />
-                    </label>
-                    <label class="input-field-group">
-                      <span class="field-title">Tăng trưởng GDP (%)</span>
-                      <input type="number" class="form-control pred-input" data-field="GDP" step="0.01" />
-                    </label>
+              <div class="lab-submit-row">
+                <button id="runPredictBtn" type="button" class="btn btn-primary btn-full-width">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <span>Chạy Suy luận & Cập nhật Dự báo Nguy cơ</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Intervention Cockpit -->
+          <div class="lab-cockpit-column">
+            <div class="data-panel cockpit-sticky-panel">
+              <div class="data-panel-header">
+                <div>
+                  <h3 class="data-panel-title">Chẩn đoán Xác suất Rủi ro</h3>
+                  <p class="data-panel-desc">Mô hình Random Forest (Luồng B - 43 chiều)</p>
+                </div>
+                <span id="predTierBadge" class="tier-badge-pill tier-low">Đang tính...</span>
+              </div>
+
+              <!-- Sleek SVG Tachometer Arc -->
+              <div class="tachometer-visual-wrapper">
+                <svg class="tachometer-svg" viewBox="0 0 240 140" aria-label="Biểu đồ đồng hồ đo rủi ro bỏ học">
+                  <defs>
+                    <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#10b981" />
+                      <stop offset="45%" stop-color="#f59e0b" />
+                      <stop offset="100%" stop-color="#ef4444" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 24 120 A 96 96 0 0 1 216 120" fill="none" class="tachometer-bg-track" stroke-width="18" stroke-linecap="round" />
+                  <path id="gaugeProgressArc" d="M 24 120 A 96 96 0 0 1 216 120" fill="none" stroke="url(#gaugeGrad)" stroke-width="18" stroke-linecap="round" stroke-dasharray="301.59" stroke-dashoffset="301.59" />
+                  <text x="120" y="96" text-anchor="middle" id="gaugePercentText" class="tachometer-number">0.0%</text>
+                  <text x="120" y="118" text-anchor="middle" class="tachometer-caption">XÁC SUẤT BỎ HỌC P(DROPOUT = 1)</text>
+                </svg>
+              </div>
+
+              <!-- Classification Threshold Controller -->
+              <div class="threshold-slider-card">
+                <div class="threshold-meta-row">
+                  <span class="threshold-label">Ngưỡng Quyết định Phân lớp:</span>
+                  <div class="threshold-chips-row">
+                    <button type="button" class="thresh-quick-btn" data-set-th="0.40">0.40 (Nhạy)</button>
+                    <button type="button" class="thresh-quick-btn" data-set-th="0.50">0.50 (Chuẩn)</button>
+                    <strong id="predThresholdVal" class="threshold-value-display">0.50</strong>
                   </div>
-                </details>
+                </div>
+                <input type="range" id="predThresholdSlider" class="slider-range-bar" min="0.20" max="0.80" step="0.05" value="0.50" />
+                <div class="decision-outcome-row">
+                  <span>Kết luận phân loại:</span>
+                  <span id="predClassBadge" class="decision-pill">—</span>
+                </div>
+              </div>
 
-                <div class="action-submit-row">
-                  <button id="runPredictBtn" type="button" class="btn btn-primary btn-full-width">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <span>Tính toán & Cập nhật Dự báo Nguy cơ</span>
+              <!-- What-If Intervention Triggers Box -->
+              <div class="whatif-triggers-card">
+                <div class="whatif-header">
+                  <span class="whatif-icon">⚡</span>
+                  <span class="whatif-title">Thử nghiệm Can thiệp Nhanh (What-If Playbook)</span>
+                </div>
+                <p class="whatif-hint">Bấm áp dụng các biện pháp hỗ trợ để quan sát mức giảm rủi ro $\Delta P\%$:</p>
+                <div class="whatif-action-buttons">
+                  <button type="button" class="btn-playbook" id="actionPayTuition" title="Hỗ trợ hoàn thành học phí và xóa nợ sinh viên">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span>Hỗ trợ Học phí</span>
+                  </button>
+                  <button type="button" class="btn-playbook" id="actionGrantScholarship" title="Cấp học bổng khuyến khích học tập">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>Cấp Học bổng</span>
+                  </button>
+                  <button type="button" class="btn-playbook" id="actionBoostSem2" title="Kèm cặp phụ đạo: Tăng 3 môn đậu và +2.5 điểm HK2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    <span>Phụ đạo HK2</span>
                   </button>
                 </div>
               </div>
-            </div>
 
-            <!-- Right Column: Sticky Academic Intelligence Cockpit -->
-            <div class="predictor-cockpit-col">
-              <div class="panel-card cockpit-sticky-card">
-                <div class="panel-card-header">
-                  <div>
-                    <h3 class="panel-title">Chỉ số Nguy cơ Bỏ học</h3>
-                    <p class="panel-sub">Random Forest (Luồng B - 43 đặc trưng)</p>
-                  </div>
-                  <span id="predTierBadge" class="tier-indicator-pill tier-low">Đang tính...</span>
+              <!-- Advisor Action Recommendation Callout -->
+              <div id="recommendationBox" class="advisor-callout rec-low">
+                <div class="advisor-callout-head">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>Khuyến nghị Cố vấn Học tập</span>
                 </div>
+                <p id="recommendationText" class="advisor-callout-text">—</p>
+              </div>
 
-                <!-- Circular SVG Risk Tachometer -->
-                <div class="gauge-meter-wrapper">
-                  <svg class="risk-tachometer-svg" viewBox="0 0 240 140" aria-label="Đồng hồ xác suất bỏ học">
-                    <defs>
-                      <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#10b981" />
-                        <stop offset="45%" stop-color="#f59e0b" />
-                        <stop offset="100%" stop-color="#ef4444" />
-                      </linearGradient>
-                    </defs>
-                    <!-- Background Track -->
-                    <path d="M 24 120 A 96 96 0 0 1 216 120" fill="none" class="gauge-back-track" stroke-width="18" stroke-linecap="round" />
-                    <!-- Dynamic Progress Track -->
-                    <path id="gaugeProgressArc" d="M 24 120 A 96 96 0 0 1 216 120" fill="none" stroke="url(#gaugeGrad)" stroke-width="18" stroke-linecap="round" stroke-dasharray="301.59" stroke-dashoffset="301.59" />
-                    <text x="120" y="96" text-anchor="middle" id="gaugePercentText" class="gauge-percent-display">0.0%</text>
-                    <text x="120" y="118" text-anchor="middle" class="gauge-sublabel">XÁC SUẤT BỎ HỌC P(DROPOUT = 1)</text>
-                  </svg>
-                </div>
-
-                <!-- Decision Threshold Slider & Classification -->
-                <div class="threshold-control-card">
-                  <div class="threshold-header">
-                    <span>Ngưỡng Quyết định Phân lớp:</span>
-                    <div class="threshold-chip-group">
-                      <button type="button" class="threshold-quick-btn" data-set-th="0.40">0.40 (Nhạy)</button>
-                      <button type="button" class="threshold-quick-btn" data-set-th="0.50">0.50 (Chuẩn)</button>
-                      <strong id="predThresholdVal" class="threshold-numeric">0.50</strong>
-                    </div>
-                  </div>
-                  <input type="range" id="predThresholdSlider" class="form-range-slider" min="0.20" max="0.80" step="0.05" value="0.50" />
-                  <div class="decision-result-row">
-                    <span>Kết luận phân loại:</span>
-                    <span id="predClassBadge" class="decision-badge">—</span>
-                  </div>
-                </div>
-
-                <!-- Interactive What-If Intervention Studio -->
-                <div class="what-if-intervention-box">
-                  <div class="intervention-header">
-                    <span class="intervention-icon">⚡</span>
-                    <span class="intervention-title">Mô phỏng Can thiệp Học vụ (What-If Actions)</span>
-                  </div>
-                  <p class="intervention-desc">Thử áp dụng các chính sách hỗ trợ để xem ngay mức độ giảm rủi ro bỏ học:</p>
-                  <div class="intervention-actions-grid">
-                    <button type="button" class="btn-intervention" id="actionPayTuition" title="Hỗ trợ đóng học phí và xóa nợ tồn đọng">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                      <span>Hỗ trợ Học phí</span>
-                    </button>
-                    <button type="button" class="btn-intervention" id="actionGrantScholarship" title="Cấp học bổng khuyến khích học tập">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <span>Cấp Học bổng</span>
-                    </button>
-                    <button type="button" class="btn-intervention" id="actionBoostSem2" title="Kèm cặp phụ đạo: Tăng môn đậu HK2 (+3 môn, điểm +2.0)">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                      <span>Phụ đạo HK2</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Academic Advisor Action Recommendation -->
-                <div id="recommendationBox" class="recommendation-callout rec-low">
-                  <div class="rec-header">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <span>Khuyến nghị Hành động cho Cố vấn Học tập</span>
-                  </div>
-                  <p id="recommendationText" class="rec-body">—</p>
-                </div>
-
-                <!-- Drivers Breakdown (Risk vs Protective) -->
-                <div class="drivers-duo-container">
-                  <div class="driver-column">
-                    <h4 class="driver-group-title text-crimson">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                      Yếu tố tăng nguy cơ
-                    </h4>
-                    <ul id="riskDriversList" class="drivers-items-list list-danger"></ul>
-                  </div>
-
-                  <div class="driver-column">
-                    <h4 class="driver-group-title text-emerald">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                      Yếu tố bảo vệ an toàn
-                    </h4>
-                    <ul id="protectiveList" class="drivers-items-list list-safe"></ul>
-                  </div>
-                </div>
-
-                <!-- 7 Engineered Domain Features -->
-                <div class="engineered-features-container">
-                  <h4 class="engineered-section-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-                    7 Đặc trưng Miền Giáo dục (Luồng B)
+              <!-- Risk Drivers vs Protective Factors -->
+              <div class="factors-dual-grid">
+                <div class="factor-column">
+                  <h4 class="factor-header text-crimson">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Yếu tố tăng nguy cơ
                   </h4>
-                  <div id="engineeredFeaturesGrid" class="engineered-metrics-grid"></div>
+                  <ul id="riskDriversList" class="factors-list list-danger"></ul>
                 </div>
+                <div class="factor-column">
+                  <h4 class="factor-header text-emerald">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Yếu tố bảo vệ an toàn
+                  </h4>
+                  <ul id="protectiveList" class="factors-list list-safe"></ul>
+                </div>
+              </div>
+
+              <!-- 7 Domain-Engineered Features Grid -->
+              <div class="engineered-features-block">
+                <h4 class="eng-block-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                  7 Đặc trưng Miền Giáo dục (Luồng B)
+                </h4>
+                <div id="engineeredFeaturesGrid" class="eng-chips-grid"></div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- ===============================================================
-             VIEW 3: BATCH CSV SCREENING & COHORT INTELLIGENCE
-             =============================================================== -->
-        <section id="view-batch" class="page-view">
-          <div class="panel-card">
-            <div class="panel-card-header">
-              <div>
-                <h3 class="panel-title">Sàng lọc Nguy cơ Bỏ học Hàng loạt từ File CSV</h3>
-                <p class="panel-sub">Tải lên danh sách sinh viên định dạng CSV (hỗ trợ dấu chấm phẩy <code>;</code> hoặc dấu phẩy <code>,</code> theo chuẩn UCI)</p>
+      <!-- ===================================================================
+           VIEW 3: COHORT BATCH SCREENING (CSV)
+           =================================================================== -->
+      <section id="view-batch" class="observatory-view">
+        <div class="data-panel">
+          <div class="data-panel-header wrap-header">
+            <div>
+              <h3 class="data-panel-title">Sàng lọc Nguy cơ Bỏ học Hàng loạt từ File CSV</h3>
+              <p class="data-panel-desc">Tải lên danh sách sinh viên định dạng CSV (tự động xử lý dấu chấm phẩy <code>;</code> hoặc dấu phẩy <code>,</code>)</p>
+            </div>
+            <div class="header-button-group">
+              <a href="/api/batch-sample" class="btn btn-outline btn-sm" download>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Tải CSV Mẫu (25 SV)</span>
+              </a>
+              <button id="runDemoBatchBtn" class="btn btn-primary btn-sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Chạy Thử với 25 SV Mẫu</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Modern Animated Drag & Drop Zone -->
+          <div id="csvDropzone" class="modern-drop-area" tabindex="0" role="button" aria-label="Kéo thả hoặc tải lên file CSV">
+            <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden />
+            <div class="drop-icon-sphere">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="drop-text-content">
+              <p class="drop-primary-text">Kéo thả tệp <code>.csv</code> vào đây hoặc <span class="accent-link">chọn tệp từ máy tính</span></p>
+              <p class="drop-secondary-text">Tự động nhận diện 36 cột chuẩn UCI và điền giá trị trung vị cho các thuộc tính thiếu</p>
+            </div>
+          </div>
+
+          <div class="batch-settings-strip">
+            <label class="compact-inline-option">
+              <span>Ngưỡng phân lớp áp dụng:</span>
+              <select id="batchThresholdSelect" class="form-input select-compact">
+                <option value="0.50" selected>0.50 (Cân bằng chuẩn)</option>
+                <option value="0.40">0.40 (Độ nhạy cao - Cảnh báo sớm)</option>
+              </select>
+            </label>
+            <div id="batchStatusMsg" class="batch-status-text"></div>
+          </div>
+        </div>
+
+        <!-- Batch Screening Results Output -->
+        <div id="batchResultsContainer" class="hidden">
+          <!-- Summary Metric Cards -->
+          <div class="kpi-ribbon-grid">
+            <div class="kpi-ribbon-card">
+              <div class="kpi-top-row"><span class="kpi-title">Tổng Sinh viên Sàng lọc</span></div>
+              <div id="batchTotalCount" class="kpi-mega-number">0</div>
+              <div id="batchMatchedCols" class="kpi-detail-note">Khớp đầy đủ các cột đặc trưng</div>
+            </div>
+
+            <div class="kpi-ribbon-card">
+              <div class="kpi-top-row">
+                <span class="kpi-title">Tầng Cao (&gt;= 70%)</span>
+                <span class="kpi-tag-chip tag-crimson">Khẩn cấp</span>
               </div>
-              <div class="btn-cluster">
-                <a href="/api/batch-sample" class="btn btn-outline btn-sm" download>
+              <div id="batchHighCount" class="kpi-mega-number text-crimson">0</div>
+              <div class="kpi-detail-note">Cần liên hệ trực tiếp & can thiệp ngay</div>
+            </div>
+
+            <div class="kpi-ribbon-card">
+              <div class="kpi-top-row">
+                <span class="kpi-title">Tầng Trung bình (40–70%)</span>
+                <span class="kpi-tag-chip tag-amber">Theo dõi</span>
+              </div>
+              <div id="batchMedCount" class="kpi-mega-number text-amber">0</div>
+              <div class="kpi-detail-note">Lên lịch tư vấn học tập định kỳ</div>
+            </div>
+
+            <div class="kpi-ribbon-card">
+              <div class="kpi-top-row">
+                <span class="kpi-title">Tầng Thấp (&lt; 40%)</span>
+                <span class="kpi-tag-chip tag-emerald">An toàn</span>
+              </div>
+              <div id="batchLowCount" class="kpi-mega-number text-emerald">0</div>
+              <div class="kpi-detail-note">Xác suất TB: <strong id="batchAvgProb">0%</strong></div>
+            </div>
+          </div>
+
+          <!-- Batch Table Panel -->
+          <div class="data-panel">
+            <div class="data-panel-header wrap-header">
+              <div>
+                <h3 class="data-panel-title">Bảng Phân loại & Kế hoạch Can thiệp Chi tiết</h3>
+                <p class="data-panel-desc">Sắp xếp ưu tiên theo xác suất bỏ học giảm dần để hỗ trợ Cố vấn học tập</p>
+              </div>
+              <div class="header-button-group">
+                <select id="batchTierFilter" class="form-input select-compact">
+                  <option value="all">Tất cả tầng rủi ro</option>
+                  <option value="high">Chỉ Tầng Cao (&gt;= 70%)</option>
+                  <option value="medium">Chỉ Tầng Trung bình</option>
+                  <option value="low">Chỉ Tầng Thấp</option>
+                </select>
+                <button id="exportBatchCsvBtn" class="btn btn-outline btn-sm">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  <span>Tải File CSV Mẫu (25 SV)</span>
-                </a>
-                <button id="runDemoBatchBtn" class="btn btn-primary btn-sm">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  <span>Chạy Thử với 25 SV Mẫu</span>
+                  <span>Xuất Kết quả CSV</span>
                 </button>
               </div>
             </div>
 
-            <!-- Drag and Drop Zone -->
-            <div id="csvDropzone" class="modern-dropzone" tabindex="0" role="button" aria-label="Tải lên file CSV">
-              <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden />
-              <div class="dropzone-illu">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              </div>
-              <div class="dropzone-text-group">
-                <p class="dropzone-main-text">Kéo & thả file <code>.csv</code> vào đây, hoặc <span class="highlight-link">nhấn để duyệt file từ máy tính</span></p>
-                <p class="dropzone-sub-text">Hệ thống tự động khớp tên các cột đặc trưng UCI và điền giá trị trung vị cho các cột thiếu</p>
-              </div>
-            </div>
-
-            <div class="batch-settings-bar">
-              <label class="compact-inline-field">
-                <span>Ngưỡng phân lớp áp dụng:</span>
-                <select id="batchThresholdSelect" class="form-control select-compact">
-                  <option value="0.50" selected>0.50 (Cân bằng chuẩn)</option>
-                  <option value="0.40">0.40 (Độ nhạy cao - Cảnh báo sớm)</option>
-                </select>
-              </label>
-              <div id="batchStatusMsg" class="batch-notification-msg"></div>
-            </div>
-          </div>
-
-          <!-- Batch Results Container (Displayed after analysis) -->
-          <div id="batchResultsContainer" class="hidden">
-            <!-- Batch Summary KPIs -->
-            <div class="metric-tiles-grid">
-              <div class="metric-tile">
-                <div class="tile-header"><span class="tile-label">Tổng Sinh viên Sàng lọc</span></div>
-                <div id="batchTotalCount" class="tile-number">0</div>
-                <div id="batchMatchedCols" class="tile-sub">Khớp 36/36 cột đặc trưng</div>
-              </div>
-
-              <div class="metric-tile">
-                <div class="tile-header">
-                  <span class="tile-label">Tầng Cao (&gt;= 70%)</span>
-                  <span class="tile-badge badge-red">Khẩn cấp</span>
-                </div>
-                <div id="batchHighCount" class="tile-number text-crimson">0</div>
-                <div class="tile-sub">Cần liên hệ trực tiếp & can thiệp ngay</div>
-              </div>
-
-              <div class="metric-tile">
-                <div class="tile-header">
-                  <span class="tile-label">Tầng Trung bình (40–70%)</span>
-                  <span class="tile-badge badge-amber">Theo dõi</span>
-                </div>
-                <div id="batchMedCount" class="tile-number text-amber">0</div>
-                <div class="tile-sub">Lên lịch tư vấn học tập định kỳ</div>
-              </div>
-
-              <div class="metric-tile">
-                <div class="tile-header">
-                  <span class="tile-label">Tầng Thấp (&lt; 40%)</span>
-                  <span class="tile-badge badge-emerald">An toàn</span>
-                </div>
-                <div id="batchLowCount" class="tile-number text-emerald">0</div>
-                <div class="tile-sub">Xác suất TB: <strong id="batchAvgProb">0%</strong></div>
-              </div>
-            </div>
-
-            <!-- Batch Table Card -->
-            <div class="panel-card">
-              <div class="panel-card-header wrap-controls">
-                <div>
-                  <h3 class="panel-title">Bảng Chi tiết Phân tầng Rủi ro Toàn bộ Danh sách</h3>
-                  <p class="panel-sub">Được sắp xếp ưu tiên theo xác suất bỏ học giảm dần để thuận tiện can thiệp</p>
-                </div>
-                <div class="btn-cluster">
-                  <select id="batchTierFilter" class="form-control select-compact">
-                    <option value="all">Tất cả tầng rủi ro</option>
-                    <option value="high">Chỉ Tầng Cao (&gt;= 70%)</option>
-                    <option value="medium">Chỉ Tầng Trung bình</option>
-                    <option value="low">Chỉ Tầng Thấp</option>
-                  </select>
-                  <button id="exportBatchCsvBtn" class="btn btn-outline btn-sm">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span>Xuất Kết quả CSV</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="responsive-table-wrap">
-                <table class="modern-data-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Ngành đào tạo</th>
-                      <th>Tuổi</th>
-                      <th>Đậu HK1</th>
-                      <th>Đậu HK2</th>
-                      <th>TB 2 Kỳ</th>
-                      <th>Học phí</th>
-                      <th>Xác suất</th>
-                      <th>Tầng rủi ro</th>
-                      <th>Khuyến nghị hành động</th>
-                    </tr>
-                  </thead>
-                  <tbody id="batchTableBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===============================================================
-             VIEW 4: EXPERIMENTAL BENCHMARKS & SCIENTIFIC FIGURES
-             =============================================================== -->
-        <section id="view-experiments" class="page-view">
-          <div class="grid-layout-2">
-            <!-- Flow A vs Flow B Comparison Chart -->
-            <div class="panel-card">
-              <div class="panel-card-header">
-                <div>
-                  <h3 class="panel-title">Đối sánh Luồng A (Cơ bản) vs Luồng B (Cải tiến)</h3>
-                  <p class="panel-sub">So sánh 4 thuật toán học máy trên tập kiểm thử độc lập (N = 885)</p>
-                </div>
-                <select id="expMetricSelect" class="form-control select-compact">
-                  <option value="F1-score" selected>Chỉ số F1-score</option>
-                  <option value="ROC-AUC">Chỉ số ROC-AUC</option>
-                  <option value="PR-AUC">Chỉ số PR-AUC</option>
-                  <option value="Accuracy">Chỉ số Accuracy</option>
-                  <option value="Recall">Chỉ số Recall</option>
-                  <option value="Precision">Chỉ số Precision</option>
-                </select>
-              </div>
-              <div class="chart-box h-300">
-                <canvas id="chartFlowCompare"></canvas>
-              </div>
-            </div>
-
-            <!-- Hyperparameter Tuning Chart -->
-            <div class="panel-card">
-              <div class="panel-card-header">
-                <div>
-                  <h3 class="panel-title">Khảo sát Siêu tham số Mô hình (Luồng B)</h3>
-                  <p class="panel-sub">Độ sâu max_depth (Decision Tree) và số láng giềng k (K-NN)</p>
-                </div>
-                <div class="segmented-control-mini" id="tuningAlgoToggle">
-                  <button class="seg-btn active" data-algo="Decision Tree">Cây Quyết định</button>
-                  <button class="seg-btn" data-algo="K-NN">Thuật toán K-NN</button>
-                </div>
-              </div>
-              <div class="chart-box h-300">
-                <canvas id="chartTuning"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <!-- Full 8-Configuration Benchmark Table -->
-          <div class="panel-card">
-            <div class="panel-card-header">
-              <div>
-                <h3 class="panel-title">Bảng Tổng hợp Đối sánh Đa chỉ số (8 Cấu hình Thực nghiệm)</h3>
-                <p class="panel-sub">Toàn bộ 6 độ đo phân loại nhị phân trên tập kiểm thử N = 885</p>
-              </div>
-              <span class="panel-tag tag-success">Mô hình Tốt nhất: Random Forest (Luồng B)</span>
-            </div>
-            <div class="responsive-table-wrap">
-              <table class="modern-data-table">
+            <div class="table-scroll-wrap">
+              <table class="observatory-table">
                 <thead>
                   <tr>
-                    <th>Luồng xử lý</th>
-                    <th>Thuật toán</th>
-                    <th>Accuracy</th>
-                    <th>Precision</th>
-                    <th>Recall</th>
-                    <th>F1-score</th>
-                    <th>ROC-AUC</th>
-                    <th>PR-AUC</th>
-                  </tr>
-                </thead>
-                <tbody id="resultsTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Scientific Figures Gallery -->
-          <div class="panel-card">
-            <div class="panel-card-header wrap-controls">
-              <div>
-                <h3 class="panel-title">Thư viện 7 Biểu đồ Khoa học Xuất bản</h3>
-                <p class="panel-sub">Biểu đồ độ phân giải cao phục vụ báo cáo khoa học & thuyết minh đề tài</p>
-              </div>
-              <div class="segmented-control-mini" id="galleryFilter">
-                <button class="seg-btn active" data-cat="ALL">Tất cả (7)</button>
-                <button class="seg-btn" data-cat="EDA">EDA</button>
-                <button class="seg-btn" data-cat="Model">Mô hình</button>
-                <button class="seg-btn" data-cat="Evaluation">Đánh giá</button>
-              </div>
-            </div>
-            <div id="figuresGallery" class="figures-gallery-grid"></div>
-          </div>
-        </section>
-
-        <!-- ===============================================================
-             VIEW 5: ERROR ANALYSIS & TEST COHORT EXPLORER (N = 885)
-             =============================================================== -->
-        <section id="view-errors" class="page-view">
-          <!-- 5 Status Filter Cards -->
-          <div id="errorStatusCards" class="status-summary-cards-grid"></div>
-
-          <!-- Detailed Test Records Table -->
-          <div class="panel-card">
-            <div class="panel-card-header wrap-controls">
-              <div>
-                <h3 class="panel-title">Danh mục Chi tiết Toàn bộ Hồ sơ Kiểm thử (N = 885)</h3>
-                <p class="panel-sub">Khám phá từng trường hợp dự đoán đúng và sai để phục vụ Error Analysis</p>
-              </div>
-
-              <div class="filter-controls-row">
-                <input type="text" id="errSearchInput" class="form-control search-input" placeholder="Tìm kiếm mã SV hoặc tên ngành..." />
-                <select id="errTierFilter" class="form-control select-compact">
-                  <option value="ALL">Tất cả tầng rủi ro</option>
-                  <option value="Cao (>= 70%)">Tầng Cao (&gt;= 70%)</option>
-                  <option value="Trung bình (40% - 70%)">Tầng Trung bình (40–70%)</option>
-                  <option value="Thấp (< 40%)">Tầng Thấp (&lt; 40%)</option>
-                </select>
-                <select id="errSortSelect" class="form-control select-compact">
-                  <option value="prob_desc">Xác suất cao → thấp</option>
-                  <option value="prob_asc">Xác suất thấp → cao</option>
-                  <option value="id_asc">Mã sinh viên tăng dần</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="responsive-table-wrap">
-              <table class="modern-data-table">
-                <thead>
-                  <tr>
-                    <th>Mã SV</th>
+                    <th>#</th>
                     <th>Ngành đào tạo</th>
-                    <th>Đậu HK1 / HK2</th>
-                    <th>TB HK2</th>
-                    <th>Học phí / Nợ</th>
-                    <th>Thực tế</th>
+                    <th>Tuổi</th>
+                    <th>Đậu HK1</th>
+                    <th>Đậu HK2</th>
+                    <th>TB 2 Kỳ</th>
+                    <th>Học phí</th>
                     <th>Xác suất</th>
-                    <th>Trạng thái Phân lớp</th>
-                    <th>Thao tác</th>
+                    <th>Tầng rủi ro</th>
+                    <th>Khuyến nghị hành động</th>
                   </tr>
                 </thead>
-                <tbody id="errorTableBody"></tbody>
+                <tbody id="batchTableBody"></tbody>
               </table>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <!-- Pagination Bar -->
-            <div class="table-pagination-bar">
-              <span id="errPageInfo" class="pagination-info">Hiển thị 0 / 0 hồ sơ</span>
-              <div class="btn-cluster">
-                <button id="errPrevBtn" class="btn btn-outline btn-sm">← Trang trước</button>
-                <button id="errNextBtn" class="btn btn-outline btn-sm">Trang sau →</button>
+      <!-- ===================================================================
+           VIEW 4: ML BENCHMARKS & SCIENTIFIC FIGURES
+           =================================================================== -->
+      <section id="view-experiments" class="observatory-view">
+        <div class="observatory-split-layout">
+          <!-- Flow A vs Flow B -->
+          <div class="data-panel">
+            <div class="data-panel-header">
+              <div>
+                <h3 class="data-panel-title">Đối sánh Luồng A (Cơ bản) vs Luồng B (Cải tiến)</h3>
+                <p class="data-panel-desc">Đánh giá 4 mô hình học máy trên tập kiểm thử độc lập (N = 885)</p>
               </div>
+              <select id="expMetricSelect" class="form-input select-compact">
+                <option value="F1-score" selected>Chỉ số F1-score</option>
+                <option value="ROC-AUC">Chỉ số ROC-AUC</option>
+                <option value="PR-AUC">Chỉ số PR-AUC</option>
+                <option value="Accuracy">Chỉ số Accuracy</option>
+                <option value="Recall">Chỉ số Recall</option>
+                <option value="Precision">Chỉ số Precision</option>
+              </select>
+            </div>
+            <div class="chart-container-box h-300">
+              <canvas id="chartFlowCompare"></canvas>
             </div>
           </div>
-        </section>
-      </main>
-    </div>
+
+          <!-- Hyperparameter Tuning -->
+          <div class="data-panel">
+            <div class="data-panel-header">
+              <div>
+                <h3 class="data-panel-title">Khảo sát Siêu tham số Mô hình (Luồng B)</h3>
+                <p class="data-panel-desc">Độ sâu cây max_depth (Decision Tree) và số láng giềng k (K-NN)</p>
+              </div>
+              <div class="segmented-threshold-toggle" id="tuningAlgoToggle">
+                <button class="thresh-btn active" data-algo="Decision Tree">Cây Quyết định</button>
+                <button class="thresh-btn" data-algo="K-NN">Thuật toán K-NN</button>
+              </div>
+            </div>
+            <div class="chart-container-box h-300">
+              <canvas id="chartTuning"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8-Configuration Scientific Evaluation Table -->
+        <div class="data-panel">
+          <div class="data-panel-header">
+            <div>
+              <h3 class="data-panel-title">Bảng Tổng hợp Đối sánh Đa chỉ số (8 Cấu hình Thực nghiệm)</h3>
+              <p class="data-panel-desc">Toàn bộ 6 độ đo phân loại nhị phân trên tập kiểm thử N = 885</p>
+            </div>
+            <span class="data-panel-badge badge-emerald">Tốt nhất: Random Forest (Luồng B)</span>
+          </div>
+          <div class="table-scroll-wrap">
+            <table class="observatory-table">
+              <thead>
+                <tr>
+                  <th>Luồng xử lý</th>
+                  <th>Thuật toán</th>
+                  <th>Accuracy</th>
+                  <th>Precision</th>
+                  <th>Recall</th>
+                  <th>F1-score</th>
+                  <th>ROC-AUC</th>
+                  <th>PR-AUC</th>
+                </tr>
+              </thead>
+              <tbody id="resultsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Scientific Figures Gallery -->
+        <div class="data-panel">
+          <div class="data-panel-header wrap-header">
+            <div>
+              <h3 class="data-panel-title">Thư viện 7 Biểu đồ Khoa học Xuất bản</h3>
+              <p class="data-panel-desc">Biểu đồ độ phân giải cao phục vụ báo cáo khoa học & thuyết minh đề tài</p>
+            </div>
+            <div class="segmented-threshold-toggle" id="galleryFilter">
+              <button class="thresh-btn active" data-cat="ALL">Tất cả (7)</button>
+              <button class="thresh-btn" data-cat="EDA">EDA</button>
+              <button class="thresh-btn" data-cat="Model">Mô hình</button>
+              <button class="thresh-btn" data-cat="Evaluation">Đánh giá</button>
+            </div>
+          </div>
+          <div id="figuresGallery" class="scientific-gallery-grid"></div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 5: ERROR DIAGNOSTICS & TEST COHORT (N = 885)
+           =================================================================== -->
+      <section id="view-errors" class="observatory-view">
+        <!-- 5 Interactive Status Cards -->
+        <div id="errorStatusCards" class="status-cards-five-grid"></div>
+
+        <!-- Detailed Table Panel -->
+        <div class="data-panel">
+          <div class="data-panel-header wrap-header">
+            <div>
+              <h3 class="data-panel-title">Danh mục Chi tiết Toàn bộ Hồ sơ Kiểm thử (N = 885)</h3>
+              <p class="data-panel-desc">Khám phá từng trường hợp dự đoán đúng và sai để phục vụ Error Analysis</p>
+            </div>
+
+            <div class="filter-toolbar-cluster">
+              <input type="text" id="errSearchInput" class="form-input search-styled" placeholder="Tìm kiếm mã SV hoặc tên ngành..." />
+              <select id="errTierFilter" class="form-input select-compact">
+                <option value="ALL">Tất cả tầng rủi ro</option>
+                <option value="Cao (>= 70%)">Tầng Cao (&gt;= 70%)</option>
+                <option value="Trung bình (40% - 70%)">Tầng Trung bình (40–70%)</option>
+                <option value="Thấp (< 40%)">Tầng Thấp (&lt; 40%)</option>
+              </select>
+              <select id="errSortSelect" class="form-input select-compact">
+                <option value="prob_desc">Xác suất cao → thấp</option>
+                <option value="prob_asc">Xác suất thấp → cao</option>
+                <option value="id_asc">Mã sinh viên tăng dần</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-scroll-wrap">
+            <table class="observatory-table">
+              <thead>
+                <tr>
+                  <th>Mã SV</th>
+                  <th>Ngành đào tạo</th>
+                  <th>Đậu HK1 / HK2</th>
+                  <th>TB HK2</th>
+                  <th>Học phí / Nợ</th>
+                  <th>Thực tế</th>
+                  <th>Xác suất</th>
+                  <th>Trạng thái Phân lớp</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="errorTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="table-footer-pagination">
+            <span id="errPageInfo" class="pagination-legend">Hiển thị 0 / 0 hồ sơ</span>
+            <div class="pagination-buttons">
+              <button id="errPrevBtn" class="btn btn-outline btn-sm">← Trang trước</button>
+              <button id="errNextBtn" class="btn btn-outline btn-sm">Trang sau →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
+  <!-- =====================================================================
+       MODALS & LIGHTBOX DIALOGS
+       ===================================================================== -->
+
   <!-- Modal: Student Profile Deep-Dive -->
-  <div id="studentModal" class="modal-backdrop-layer hidden" role="dialog" aria-modal="true">
-    <div class="modal-dialog-panel modal-lg">
-      <div class="modal-header-strip">
+  <div id="studentModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-lg">
+      <div class="modal-card-head">
         <div>
-          <h3 id="modalStudentTitle" class="modal-title">Hồ sơ Chi tiết Sinh viên</h3>
-          <p id="modalStudentSub" class="modal-sub"></p>
+          <h3 id="modalStudentTitle" class="modal-head-title">Hồ sơ Chi tiết Sinh viên</h3>
+          <p id="modalStudentSub" class="modal-head-sub"></p>
         </div>
-        <button class="modal-close-btn" data-close-modal="studentModal" aria-label="Đóng cửa sổ">✕</button>
+        <button class="modal-dismiss-btn" data-close-modal="studentModal" aria-label="Đóng">✕</button>
       </div>
-      <div id="modalStudentBody" class="modal-body-scrollable"></div>
-      <div class="modal-footer-strip">
+      <div id="modalStudentBody" class="modal-card-body"></div>
+      <div class="modal-card-foot">
         <button class="btn btn-outline" data-close-modal="studentModal">Đóng</button>
         <button id="modalLoadWhatIfBtn" class="btn btn-primary">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
@@ -970,43 +958,43 @@
   </div>
 
   <!-- Modal: High-Res Scientific Figure Lightbox -->
-  <div id="imageModal" class="modal-backdrop-layer hidden" role="dialog" aria-modal="true">
-    <div class="modal-dialog-panel modal-xl">
-      <div class="modal-header-strip">
+  <div id="imageModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-xl">
+      <div class="modal-card-head">
         <div>
-          <h3 id="lightboxTitle" class="modal-title">Biểu đồ Khoa học</h3>
-          <p id="lightboxDesc" class="modal-sub"></p>
+          <h3 id="lightboxTitle" class="modal-head-title">Biểu đồ Khoa học</h3>
+          <p id="lightboxDesc" class="modal-head-sub"></p>
         </div>
-        <button class="modal-close-btn" data-close-modal="imageModal" aria-label="Đóng cửa sổ">✕</button>
+        <button class="modal-dismiss-btn" data-close-modal="imageModal" aria-label="Đóng">✕</button>
       </div>
-      <div class="modal-lightbox-content">
+      <div class="modal-lightbox-display">
         <img id="lightboxImg" src="" alt="Biểu đồ khoa học độ phân giải cao" />
       </div>
     </div>
   </div>
 
   <!-- Modal: Academic Project & Team 9 Metadata -->
-  <div id="teamModal" class="modal-backdrop-layer hidden" role="dialog" aria-modal="true">
-    <div class="modal-dialog-panel">
-      <div class="modal-header-strip">
+  <div id="teamModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-card-head">
         <div>
-          <h3 class="modal-title">Thông tin Đề tài & Nhóm Nghiên cứu</h3>
-          <p class="modal-sub">Học phần Nhập môn Học máy (FIT4013) • Năm học 2026–2027</p>
+          <h3 class="modal-head-title">Thông tin Đề tài & Nhóm Nghiên cứu</h3>
+          <p class="modal-head-sub">Học phần Nhập môn Học máy (FIT4013) • Năm học 2026–2027</p>
         </div>
-        <button class="modal-close-btn" data-close-modal="teamModal" aria-label="Đóng cửa sổ">✕</button>
+        <button class="modal-dismiss-btn" data-close-modal="teamModal" aria-label="Đóng">✕</button>
       </div>
-      <div class="modal-body-scrollable">
-        <div class="team-context-card">
-          <div class="context-row"><strong>Đề tài:</strong> Hệ thống Cảnh báo sớm Sinh viên có Nguy cơ Bỏ học (Student Dropout Prediction)</div>
-          <div class="context-row"><strong>Giảng viên hướng dẫn:</strong> ThS. Lê Thị Thuỳ Trang</div>
-          <div class="context-row"><strong>Kiến trúc Mô hình:</strong> Luồng B (7 đặc trưng miền giáo dục + OneHotEncoder + StandardScaler) + Random Forest Classifier (100 cây, max_depth=15)</div>
+      <div class="modal-card-body">
+        <div class="team-meta-box">
+          <div class="meta-row"><strong>Đề tài:</strong> Hệ thống Cảnh báo sớm Sinh viên có Nguy cơ Bỏ học (Student Dropout Prediction)</div>
+          <div class="meta-row"><strong>Giảng viên hướng dẫn:</strong> ThS. Lê Thị Thuỳ Trang</div>
+          <div class="meta-row"><strong>Kiến trúc Mô hình:</strong> Luồng B (7 đặc trưng miền giáo dục + OneHotEncoder + StandardScaler) + Random Forest Classifier (100 cây, max_depth=15)</div>
         </div>
-        <div id="teamMembersList" class="team-members-list-wrap"></div>
+        <div id="teamMembersList" class="team-cards-stack"></div>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification System -->
-  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+  <!-- Floating Toast Notifications -->
+  <div id="toastContainer" class="toast-stack-container" aria-live="polite"></div>
 </body>
 </html>

@@ -79,7 +79,14 @@ async def serve_index():
     index_path = WEB_DIR / "index.html"
     if not index_path.exists():
         raise HTTPException(status_code=404, detail="Không tìm thấy giao diện web/index.html")
-    return FileResponse(str(index_path))
+    return FileResponse(
+        str(index_path),
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
 
 
 @app.get("/api/health")

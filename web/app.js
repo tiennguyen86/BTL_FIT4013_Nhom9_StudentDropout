@@ -194,13 +194,13 @@
     if (!VIEW_TITLES[viewName]) return;
     state.activeView = viewName;
 
-    // Update navigation active state
-    $$(".nav-tab").forEach((tab) => {
+    // Update navigation active state (supporting both nav-pill and nav-tab)
+    $$(".nav-pill, .nav-tab").forEach((tab) => {
       tab.classList.toggle("active", tab.dataset.view === viewName);
     });
 
-    // Update view containers
-    $$(".page-view").forEach((view) => {
+    // Update view containers (supporting both observatory-view and page-view)
+    $$(".observatory-view, .page-view").forEach((view) => {
       view.classList.toggle("active", view.id === `view-${viewName}`);
     });
 
@@ -1719,7 +1719,7 @@
     $("#themeToggleBtn")?.addEventListener("click", toggleTheme);
 
     // Setup Navigation Tabs
-    $$(".nav-tab").forEach((tab) => {
+    $$(".nav-pill, .nav-tab").forEach((tab) => {
       tab.addEventListener("click", () => {
         switchView(tab.dataset.view);
       });
